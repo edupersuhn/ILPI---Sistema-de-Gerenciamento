@@ -1,0 +1,83 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Model;
+
+/**
+ *
+ * @author Bruno
+ */
+public class ItemCardapio {
+    
+    private Cardapio cardapio;
+    private Alimento alimento;
+    private int qtdProduzida;
+    private int numeroAlimento;
+    private String refeicao;
+
+    public ItemCardapio(Cardapio cardapio, Alimento alimento, int qtdProduzida, int numeroAlimento, String refeicao) {
+        this.cardapio = cardapio;
+        this.alimento = alimento;
+        this.qtdProduzida = qtdProduzida;
+        this.numeroAlimento = numeroAlimento;
+        this.refeicao = refeicao;
+    }
+
+    public Cardapio getCardapio() {
+        return cardapio;
+    }
+
+    public void setCardapio(Cardapio cardapio) {
+        this.cardapio = cardapio;
+    }
+
+    public Alimento getAlimento() {
+        return alimento;
+    }
+
+    public void setAlimento(Alimento alimento) {
+        this.alimento = alimento;
+    }
+
+    public int getQtdProduzida() {
+        return qtdProduzida;
+    }
+
+    public void setQtdProduzida(int qtdProduzida) {
+        this.qtdProduzida = qtdProduzida;
+    }
+
+    public int getNumeroAlimento() {
+        return numeroAlimento;
+    }
+
+    public void setNumeroAlimento(int numeroAlimento) {
+        this.numeroAlimento = numeroAlimento;
+    }
+
+    public String getRefeicao() {
+        return refeicao;
+    }
+
+    public void setRefeicao(String refeicao) {
+        this.refeicao = refeicao;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof ItemCardapio) {
+            ItemCardapio iC = (ItemCardapio) o;
+            return this.numeroAlimento == iC.getNumeroAlimento();
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return "Alimento: " + alimento.getNomeAlimento() + " Quantidade: " + qtdProduzida;
+    }
+    
+}

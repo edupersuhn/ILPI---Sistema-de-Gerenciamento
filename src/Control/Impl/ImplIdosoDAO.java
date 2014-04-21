@@ -1,0 +1,305 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Control.Impl;
+
+import Control.Impl.Exception.DAOException;
+import Control.Interface.IIdosoDAO;
+import Model.Cardapio;
+import Model.Evento;
+import Model.Idoso;
+import Util.ConectionManager;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.TreeSet;
+import java.util.List;
+
+/**
+ *
+ * @author Bruno
+ */
+public class ImplIdosoDAO implements IIdosoDAO{
+
+    private static ImplIdosoDAO instance;
+    
+    private ImplIdosoDAO(){
+        
+    }
+    
+    public static ImplIdosoDAO getInstance(){
+        if(instance == null){
+            instance = new ImplIdosoDAO();
+        }
+        return instance;
+    }
+    
+    @Override
+    public void inserir(Idoso idoso) throws DAOException {
+        Connection con = ConectionManager.getInstance().getConexao();
+        
+        PreparedStatement prepared;
+        ResultSet result;
+        try {
+            //TODO Fazer o insert do idoso aqui
+            prepared = con.prepareStatement("insert into idoso ("
+                    + "COD_IDOSO,"
+                    + "NOM_IDOSO,"
+                    + "DAT_NASCIMENTO,"
+                    + "ACAMADO,"
+                    + "NUM_RG,"
+                    + "NOM_PARENT_RESP,"
+                    + "DSC_END_PARENT,"
+                    + "NUM_TEL_PARENT,"
+                    + "LOCAL_ORIGEM,"
+                    + "DSC_ENDERECO,"
+                    + "DSC_CUIDADOS_ESP) "
+                    + "values (?,?,?,?,?,?,?,?,?,?,?)");
+            
+            prepared.setInt(1, idoso.getCodIdoso());
+            prepared.setString(2, idoso.getNomeIdoso());
+            prepared.setDate(3, idoso.getDataNascimento());
+            prepared.setBoolean(4, idoso.getAcamado());
+            prepared.setInt(5, idoso.getRg());
+            prepared.setString(6, idoso.getNomeParenteResponsavel());
+            prepared.setString(7, idoso.getEndParente());
+            prepared.setString(8, idoso.getNumTelefoneParente());
+            prepared.setString(9, idoso.getLocalOrigem());
+            prepared.setString(10,"");
+            prepared.setString(11, idoso.getCuidadosEspeciais());
+
+            result = prepared.executeQuery();
+            
+        } catch (SQLException ex) {
+            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erro ao inserir alimento.");
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    @Override
+    public void atualizar(Idoso idoso) throws DAOException {
+        Connection con = ConectionManager.getInstance().getConexao();
+        
+        PreparedStatement prepared;
+        ResultSet result;
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from idoso"
+                    + " where COD_IDOSO = ?";
+            prepared = con.prepareStatement(sql);
+            
+            prepared.setInt(1, idoso.getCodIdoso());
+            
+            result = prepared.executeQuery();
+            
+            if(!result.next()){
+                inserir(idoso);
+            }else{
+                sql =  "update idoso "
+                        + "set COD_IDOSO = ?,"
+                            + "NOME = ?,"
+                            + "DAT_NASCIMENTO = ?,"
+                            + "LOCAL_ORIGEM = ? "
+                            + "NUM_TELEFONE = ?,"
+                            + "DSC_ENDERECO = ?,"
+                            + "DSC_CUIDADO_ESP = ? "
+                      + "where COD_IDOSO = ?";
+                prepared = con.prepareStatement(sql);
+                prepared.setInt(1, idoso.getCodIdoso());
+                prepared.setString(2, idoso.getNomeIdoso());
+                prepared.setDate(3, idoso.getDataNascimento());
+                prepared.setString(4, idoso.getLocalOrigem());
+                prepared.setLong(5, idoso.getNumTelefone());
+                prepared.setString(6, idoso.getEndereco());
+                prepared.setString(7, idoso.getCuidadosEspeciais());
+                prepared.setInt(8, idoso.getCodIdoso());
+                result = prepared.executeQuery();
+            }
+        } catch (SQLException ex) {
+            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erro ao atualizar alimento.");
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    @Override
+    public void remover(Idoso idoso) throws DAOException {
+        Connection con = ConectionManager.getInstance().getConexao();
+        
+        PreparedStatement prepared;
+        ResultSet result;
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from idoso"
+                    + " where COD_IDOSO = ?";
+            prepared = con.prepareStatement(sql);
+            
+            prepared.setInt(1, idoso.getCodIdoso());
+            
+            result = prepared.executeQuery();
+            
+            if(result.next()){
+                sql = "delete IDOSO "
+                     + "where COD_IDOSO = ?";
+                prepared = con.prepareStatement(sql);
+                prepared.setInt(1, idoso.getCodIdoso());
+                result = prepared.executeQuery();
+            }else{
+                throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + idoso.getCodIdoso());
+            }
+                
+        } catch (SQLException ex) {
+            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erro ao excluir o alimento.");
+            System.out.println(ex.getMessage());
+        } catch(DAOException dao){
+            System.out.println("Erro ao tentar excluir alimento! ");
+            System.out.println(dao.getMessage());
+        }
+    }
+
+    @Override
+    public List<Idoso> encontrarTodosIdosos() throws DAOException {
+        Connection con = ConectionManager.getInstance().getConexao();
+        TreeSet<Idoso> set = new TreeSet<>();
+        PreparedStatement prepared;
+        ResultSet result;
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from idoso";
+            prepared = con.prepareStatement(sql);
+            
+            result = prepared.executeQuery();
+            
+            Idoso a = null;
+            while(result.next()){
+                int codIdoso = result.getInt("COD_IDOSO");
+                String nome = result.getString("NOM_IDOSO");
+                Date data = result.getDate("DAT_NASCIMENTO");
+                String local = result.getString("LOCAL_ORIGEM");
+                String fone = result.getString("NUM_TEL_PARENT");
+                String end = result.getString("DSC_END_PARENT");
+                String cuidados = result.getString("DSC_CUIDADOS_ESP");
+                boolean acamado = result.getBoolean("ACAMADO");
+                String cpf = result.getString("NUM_CPF");
+                int rg = result.getInt("NUM_RG");
+                a = new Idoso(codIdoso, nome, data, local, fone, end, cpf, rg, cuidados, acamado);
+                
+                set.add(a);
+            }
+            if(set.isEmpty()){
+                throw new DAOException("Não foi possível encontrar alimentos");
+            }
+            ArrayList<Idoso> list = new ArrayList<>();
+            for (Iterator<Idoso> it = set.iterator(); it.hasNext();) {
+                Idoso idoso = it.next();
+                list.add(idoso);
+            }
+            return list;
+        } catch (SQLException ex) {
+            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erro ao consultar idoso.");
+            System.out.println(ex.getMessage());
+            return null;
+        } catch(DAOException dao){
+            System.out.println("Erro ao tentar excluir alimento! ");
+            System.out.println(dao.getMessage());
+            return null;
+        }
+    }
+    
+    @Override
+    public List<Idoso> encontrarTodosEvento(int evento) throws DAOException {
+        Connection con = ConectionManager.getInstance().getConexao();
+        List<Idoso> lista = new ArrayList<>();
+        PreparedStatement prepared;
+        ResultSet result;
+        PreparedStatement prepared2;
+        ResultSet result2;
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from idoso_evento "
+                        + "where COD_EVENTO = ?";
+            prepared = con.prepareStatement(sql);
+            
+            prepared.setInt(1, evento);
+            
+            result = prepared.executeQuery();
+            
+            Idoso a = null;
+            while(result.next()){
+                int codIdoso = result.getInt("COD_IDOSO");
+                
+                a = encontrarPorCodigo(codIdoso);
+                lista.add(a);
+            }
+            if(lista.size() == 0){
+                throw new DAOException("Não foi possível encontrar alimentos");
+            }
+            return lista;
+        } catch (SQLException ex) {
+            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erro ao excluir o alimento.");
+            System.out.println(ex.getMessage());
+            return null;
+        } catch(DAOException dao){
+            System.out.println("Erro ao tentar excluir alimento! ");
+            System.out.println(dao.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Idoso encontrarPorCodigo(int codigo) throws DAOException {
+        Connection con = ConectionManager.getInstance().getConexao();
+        
+        PreparedStatement prepared;
+        ResultSet result;
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from idoso "
+                        + "where COD_IDOSO = ?";
+            prepared = con.prepareStatement(sql);
+            
+            prepared.setInt(1, codigo);
+            
+            result = prepared.executeQuery();
+            
+            Idoso a = null;
+            while(result.next()){
+                int codIdoso = result.getInt("COD_IDOSO");
+                String nome = result.getString("NOME");
+                Date data = result.getDate("DAT_NASCIMENTO");
+                String local = result.getString("LOCAL_ORIGEM");
+                String fone = result.getString("NUM_TELEFONE_PARENT");
+                String end = result.getString("DSC_ENDERECO_PARENT");
+                String cuidados = result.getString("DSC_CUIDADOS_ESP");
+                boolean acamado = result.getBoolean("ACAMADO");
+                String cpf = result.getString("NUM_CPF");
+                int rg = result.getInt("NUM_RG");
+                a = new Idoso(codIdoso, nome, data, local, fone, end, cpf, rg, cuidados, acamado);
+            }
+            
+            if(a == null){
+                throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codigo);
+            }
+            return a;
+        } catch (SQLException ex) {
+            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erro ao excluir o alimento.");
+            System.out.println(ex.getMessage());
+            return null;
+        } catch(DAOException dao){
+            System.out.println("Erro ao tentar encontrar o alimento! ");
+            System.out.println(dao.getMessage());
+            return null;
+        }
+    }
+    
+}

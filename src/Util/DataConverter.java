@@ -1,0 +1,42 @@
+package Util;
+
+/**
+ *
+ * @author Eduardo
+ */
+public class DataConverter {
+    
+    public static int timeTypeToInt(String time) {
+        try {
+            String[] s = time.split(":");
+            if(s.length != 2) return -1;
+            int hora = Integer.parseInt(s[0]);
+            int min = Integer.parseInt(s[1]);
+            if((hora >= 0 && hora <= 23) && (min >= 0 && min <= 59)) {
+                return Integer.parseInt(s[0] + s[1]);
+            }
+            else return -1;
+        } catch(Exception ex) {
+            return -1;
+        }
+    }
+    
+    public static long dateTypeToLong(String date) {
+        try {
+            String[] s = date.split("/");
+            if(s.length != 3) return -1;
+            int d = Integer.parseInt(s[0]);
+            int m = Integer.parseInt(s[1]);
+            int a = Integer.parseInt(s[2]);
+            if((d >= 1 && d <= 31) && (m >= 1 && m <= 12) && (a >= 1000)) {
+                return Long.parseLong(s[0] + s[1] + s[2]);
+            }
+            else {
+                return -1;
+            }
+        } catch(Exception ex) {
+            return -1;
+        }
+    }
+    
+}
