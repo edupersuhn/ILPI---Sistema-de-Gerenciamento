@@ -46,7 +46,7 @@ public class IdosoController {
             prepared.setString(2,idoso.getNomeIdoso());
             prepared.setDate(3, idoso.getDataNascimento());
             prepared.setString(4, idoso.getLocalOrigem());
-            prepared.setLong(5, idoso.getNumTelefone());
+            prepared.setString(5, idoso.getNumTelefone());
             ResultSet resultSet = prepared.executeQuery();
         } catch (SQLException ex) {
             Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);

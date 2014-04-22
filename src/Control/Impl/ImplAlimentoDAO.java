@@ -4,9 +4,8 @@
  */
 package Control.Impl;
 
-import Control.IdosoController;
 import Control.Impl.Exception.DAOException;
-import Control.Interface.IAlimentoDAO;
+import Control.Interface.IDAO;
 import Model.Alimento;
 import Util.ConectionManager;
 import java.sql.Connection;
@@ -14,14 +13,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Bruno
  */
-public class ImplAlimentoDAO implements IAlimentoDAO{
+public class ImplAlimentoDAO implements IDAO<Alimento> {
 
     private static ImplAlimentoDAO instance;
     
@@ -148,7 +145,6 @@ public class ImplAlimentoDAO implements IAlimentoDAO{
         }
     }
 
-    @Override
     public List<Alimento> encontrarTodos() throws DAOException {
         Connection con = ConectionManager.getInstance().getConexao();
         List<Alimento> lista = new ArrayList<Alimento>();
@@ -188,7 +184,6 @@ public class ImplAlimentoDAO implements IAlimentoDAO{
         }
     }
 
-    @Override
     public Alimento encontrarPorCodigo(int codigo) throws DAOException {
         Connection con = ConectionManager.getInstance().getConexao();
         
@@ -230,7 +225,6 @@ public class ImplAlimentoDAO implements IAlimentoDAO{
         }
     }
 
-    @Override
     public Alimento encontrarPorNome(String nome) throws DAOException {
         Connection con = ConectionManager.getInstance().getConexao();
         
