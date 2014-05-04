@@ -8,20 +8,13 @@ package View;
 
 import Control.Impl.Exception.DAOException;
 import Control.Impl.ImplQuartoDAO;
-import Control.Impl.ImplRemedioDAO;
 import Model.Quarto;
-import Model.Remedio;
+import Util.ComponentValidator;
 import Util.Mensagens;
-import View.components_controlers.ComboBoxControler;
-import View.components_controlers.ComponentControler;
-import View.components_controlers.Input;
-import View.components_controlers.IntegerFieldContoler;
-import View.components_controlers.TextFieldControler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -29,88 +22,35 @@ import javax.swing.JOptionPane;
  */
 public class FrameCadastroQuarto extends javax.swing.JFrame {
 
-    // COMPONENTES DA ABA DE CADASTRO
-    private static final String KEY_NUM_QUARTO = "numQuarto";
-    private static final String KEY_NUM_ANDAR = "numAndar";
-    private static final String KEY_CAPACIDADE = "capacidade";
-    private HashMap<String, ComponentControler> componentesCadastro;
-    private ArrayList<Input> entradasCadastro;
-    
-    // COMPONENTES DA ABA DE EDIÇÃO
-    private ComboBoxControler consulta;
-    private HashMap<String, ComponentControler> componentesEdicao;
-    private ArrayList<Input> entradasEdicao;
     private Quarto quarto;
-    
     
     /**
      * Creates new form FrameCadastroQuarto
      */
     public FrameCadastroQuarto() {
         initComponents();
-        componentesCadastro = new HashMap<>();
-        componentesEdicao = new HashMap<>();
-        entradasCadastro = new ArrayList<>();
-        entradasEdicao = new ArrayList<>();
-        IntegerFieldContoler numQuarto = new IntegerFieldContoler(campoNumQuarto);
-        componentesCadastro.put(KEY_NUM_QUARTO, numQuarto);
-        entradasCadastro.add(numQuarto);
-        IntegerFieldContoler numAndar = new IntegerFieldContoler(campoNumAndar);
-        componentesCadastro.put(KEY_NUM_ANDAR, numAndar);
-        entradasCadastro.add(numAndar);
-        IntegerFieldContoler capacidade = new IntegerFieldContoler(campoCapacidade);
-        componentesCadastro.put(KEY_CAPACIDADE, capacidade);
-        entradasCadastro.add(capacidade);
-        
-        consulta = new ComboBoxControler(comboBoxConsulta);
-        IntegerFieldContoler numQuartoE = new IntegerFieldContoler(campoNumQuartoEdicao);
-        componentesEdicao.put(KEY_NUM_QUARTO, numQuartoE);
-        entradasEdicao.add(numQuartoE);
-        IntegerFieldContoler numAndarE = new IntegerFieldContoler(campoNumAndarEdicao);
-        componentesEdicao.put(KEY_NUM_ANDAR, numAndarE);
-        entradasEdicao.add(numAndarE);
-        IntegerFieldContoler capacidadeE = new IntegerFieldContoler(campoCapacidadeEdicao);
-        componentesEdicao.put(KEY_CAPACIDADE, capacidadeE);
-        entradasEdicao.add(capacidadeE);
-        
     }
     
-    private boolean validaCadastro() {
-        for (Iterator<Input> it = entradasCadastro.iterator(); it.hasNext();) {
-            Input input = it.next();
-            System.out.println("Valido : " + input.isValid());
-            if(! input.isValid()) return false;
-        }
-        return true;
-    }
-    
-    private boolean validaEdicao() {
-        for (Iterator<Input> it = entradasEdicao.iterator(); it.hasNext();) {
-            Input input = it.next();
-            if(! input.isValid()) return false;
-        }
-        return true;
-    }
     
     private void limparCadastro() {
-        for (Iterator<ComponentControler> it = componentesCadastro.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        campoCapacidade.setText("");
+        campoNumAndar.setText("");
+        campoNumQuarto.setText("");
     }
     
     private void limparEdicao() {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        comboBoxConsulta.setSelectedIndex(0);
+        campoCapacidadeEdicao.setText("");
+        campoNumAndarEdicao.setText("");
+        campoNumQuartoEdicao.setText("");
+        habilitado(false);
     }
     
     private void habilitado(boolean flag) {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.habilitado(flag);
-        }
+        campoCapacidadeEdicao.setEnabled(flag);
+        campoNumAndarEdicao.setEnabled(flag);
+        campoNumQuartoEdicao.setEnabled(flag);
+        botaoSalvar.setEnabled(flag);
     }
 
     /**
@@ -261,19 +201,15 @@ public class FrameCadastroQuarto extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(campoCapacidadeEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(campoNumAndarEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(campoNumQuartoEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(133, Short.MAX_VALUE))))
+                            .addComponent(campoNumQuartoEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(comboBoxConsulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(botaoConsultar))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(73, 73, 73)
-                                .addComponent(botaoSalvar)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(comboBoxConsulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(botaoConsultar))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(73, 73, 73)
+                        .addComponent(botaoSalvar)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -316,64 +252,44 @@ public class FrameCadastroQuarto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastrarActionPerformed
-        if(validaCadastro()) {
-            Quarto q = new Quarto();
-            q.setNumQuarto((int) componentesCadastro.get(KEY_NUM_ANDAR).getValue());
-            q.setNumAndar((int) componentesCadastro.get(KEY_NUM_ANDAR).getValue());
-            q.setCapacidade((int) componentesCadastro.get(KEY_CAPACIDADE).getValue());
-            q.setEstado(Quarto.ESTADO_DISPONIVEL);
-            try {
-                ImplQuartoDAO.getInstance().inserir(q);
-                limparCadastro();
-                Mensagens.cadastradoComSucesso(this);
-            } catch(DAOException ex) {
-                ex.printStackTrace();
-            }
+        Quarto q = new Quarto();
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoNumAndar)) {
+            q.setNumQuarto(Integer.parseInt(campoNumAndar.getText()));
         }
         else {
-            Mensagens.camposInvalidos(this);
+            Mensagens.campoInvalido(this, "Campo Número do Andar");
+        }
+        if(ComponentValidator.integer(campoNumQuarto)) {
+            q.setNumAndar(Integer.parseInt(campoNumQuarto.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Número do Quarto");
+        }
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoCapacidade)) {
+            q.setCapacidade(Integer.parseInt(campoCapacidade.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Capacidade");
+        }
+        q.setEstado(Quarto.ESTADO_DISPONIVEL);
+        try {
+            ImplQuartoDAO.getInstance().inserir(q);
+            limparCadastro();
+            Mensagens.cadastradoComSucesso(this);
+        } catch(DAOException ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
 
-    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
-        if(validaEdicao()) {
-            if(quarto == null) {
-                Mensagens.nadaParaAlterar(this);
-            }
-            else {
-                try {
-                    Quarto quaAtual = new Quarto();
-                    quaAtual.setNumAndar(quarto.getNumAndar());
-                    quaAtual.setNumAndar((int) componentesEdicao.get(KEY_NUM_QUARTO).getValue());
-                    quaAtual.setNumAndar((int) componentesEdicao.get(KEY_NUM_ANDAR).getValue());
-                    quaAtual.setCapacidade((int) componentesEdicao.get(KEY_CAPACIDADE).getValue());
-                    ImplQuartoDAO.getInstance().atualizar(quaAtual);
-                    Mensagens.alteradoComSucesso(this);
-                    consulta.limpar();
-                    limparEdicao();
-                    quarto = null;
-                    habilitado(false);
-                    botaoSalvar.setEnabled(false);
-                } catch(Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-        else {
-            Mensagens.camposInvalidos(this);
-        }
-    }//GEN-LAST:event_botaoSalvarActionPerformed
-
     private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
-        if(consulta.isValid()) {
+        if(comboBoxConsulta.getSelectedIndex() != 0) {
             try {
-                quarto = ImplQuartoDAO.getInstance().encontrarPorCodigo(((Quarto) consulta.getValue()).getNumQuarto(), ((Quarto) consulta.getValue()).getNumAndar());
+                quarto = ImplQuartoDAO.getInstance().encontrarPorCodigo(((Quarto) comboBoxConsulta.getSelectedItem()).getNumQuarto(), ((Quarto) comboBoxConsulta.getSelectedItem()).getNumAndar());
                 if(quarto != null) {
                     habilitado(true);
-                    botaoSalvar.setEnabled(true);
-                    componentesEdicao.get(KEY_NUM_QUARTO).setValue(quarto.getNumQuarto());
-                    componentesEdicao.get(KEY_NUM_ANDAR).setValue(quarto.getNumAndar());
-                    componentesEdicao.get(KEY_CAPACIDADE).setValue(quarto.getCapacidade());
+                    campoCapacidadeEdicao.setText(quarto.getCapacidade() + "");
+                    campoNumAndarEdicao.setText(quarto.getNumAndar()+ "");
+                    campoNumQuartoEdicao.setText(quarto.getNumQuarto()+ "");
                 }
                 else {
                     Mensagens.naoEncontradoConsulta(this);
@@ -383,7 +299,7 @@ public class FrameCadastroQuarto extends javax.swing.JFrame {
             }
         }
         else {
-            Mensagens.camposInvalidos(this);
+            Mensagens.campoInvalido(this, "Campo Quarto");
         }
     }//GEN-LAST:event_botaoConsultarActionPerformed
 
@@ -396,7 +312,7 @@ public class FrameCadastroQuarto extends javax.swing.JFrame {
                 if(lista != null) {
                     for (Iterator<Quarto> it = lista.iterator(); it.hasNext();) {
                         Quarto q = it.next();
-                        consulta.setValue(q);
+                        comboBoxConsulta.addItem(q);
                     }
                 }
             } catch(Exception ex) {
@@ -404,6 +320,36 @@ public class FrameCadastroQuarto extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jTabbedPane1StateChanged
+
+    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
+        Quarto q = new Quarto();
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoNumAndarEdicao)) {
+            q.setNumQuarto(Integer.parseInt(campoNumAndarEdicao.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Número do Andar");
+        }
+        if(ComponentValidator.integer(campoNumQuartoEdicao)) {
+            q.setNumAndar(Integer.parseInt(campoNumQuartoEdicao.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Número do Quarto");
+        }
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoCapacidadeEdicao)) {
+            q.setCapacidade(Integer.parseInt(campoCapacidadeEdicao.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Capacidade");
+        }
+        q.setEstado(Quarto.ESTADO_DISPONIVEL);
+        try {
+            ImplQuartoDAO.getInstance().atualizar(q);
+            limparEdicao();
+            Mensagens.cadastradoComSucesso(this);
+        } catch(DAOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_botaoSalvarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botaoCadastrar;

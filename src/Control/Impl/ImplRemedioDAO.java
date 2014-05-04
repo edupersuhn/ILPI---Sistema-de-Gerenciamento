@@ -157,7 +157,7 @@ public class ImplRemedioDAO implements IRemedioDAO{
             Remedio r = null;
             while(result.next()){
                 int codigo = result.getInt("COD_REMEDIO");
-                String nomRemedio = result.getString("NOM_REMEDIO").replaceAll(" ", "");
+                String nomRemedio = result.getString("NOM_REMEDIO");
                 int qtdEstoq = result.getInt("QTD_ESTOQ");
                 String uniMedida = result.getString("DSC_UNIDADE_MEDIDA");
                 r = new Remedio(codigo, nomRemedio, qtdEstoq, uniMedida);
@@ -226,6 +226,8 @@ public class ImplRemedioDAO implements IRemedioDAO{
     public Remedio encontrarPorNome(String nome) throws DAOException {
         Connection con = ConectionManager.getInstance().getConexao();
         
+        System.out.println("Nome: " + nome);
+        
         PreparedStatement prepared;
         ResultSet result;
         try {
@@ -246,7 +248,6 @@ public class ImplRemedioDAO implements IRemedioDAO{
                 String uniMedida = result.getString("DSC_UNIDADE_MEDIDA");
                 a = new Remedio(codRemedio, nomRemedio, qtdEstoq, uniMedida);
             }
-            
             return a;
         } catch (SQLException ex) {
             //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);

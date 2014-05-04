@@ -1,5 +1,9 @@
 package Util;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  *
  * @author Eduardo
@@ -37,6 +41,19 @@ public class DataConverter {
         } catch(Exception ex) {
             return -1;
         }
+    }
+    
+    public static Date stringTypeToSQLDate(String date) {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+        Date data;
+        try {
+            data = new Date(format.parse(date).getTime());
+        } catch(ParseException ex) {
+            data = new Date(0L);
+            ex.printStackTrace();
+            return data;
+        }
+        return data;
     }
     
 }

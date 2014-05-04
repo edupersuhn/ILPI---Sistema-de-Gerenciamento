@@ -184,7 +184,7 @@ public class ImplItemPrescricaoMedica implements IItemPrescricaoMedicaDAO{
                 
                 String obsRemedio = result.getString("OBS_REMEDIO");
                 int qtdRemedio = result.getInt("QTD_REMEDIO");
-                a = new ItemPrescricaoMedica(p, rem.getCodigo(), rem, null, new boolean[7], obsRemedio, qtdRemedio, null);
+                a = new ItemPrescricaoMedica(p, rem.getCodigo(), rem, null, obsRemedio, qtdRemedio);
                 lista.add(a);
             }
             if(lista.size() == 0){
@@ -231,7 +231,7 @@ public class ImplItemPrescricaoMedica implements IItemPrescricaoMedicaDAO{
                 
                 String obsRemedio = result.getString("OBS_REMEDIO");
                 int qtdRemedio = result.getInt("QTD_REMEDIO");
-                a = new ItemPrescricaoMedica(p, numPrescricao, rem, obsRemedio, qtdRemedio);
+                a = new ItemPrescricaoMedica(p, rem.getCodigo(), rem, null, obsRemedio, qtdRemedio);
             }
             
             if(a == null){
