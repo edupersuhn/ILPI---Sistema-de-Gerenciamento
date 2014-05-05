@@ -9,187 +9,83 @@ package View;
 import Control.Impl.Exception.DAOException;
 import Control.Impl.ImplIdosoDAO;
 import Control.Impl.ImplQuartoDAO;
-import Control.Impl.ImplRemedioDAO;
 import Model.Idoso;
 import Model.Quarto;
-import Model.Remedio;
-import Util.DataValidator;
+import Util.ComponentValidator;
+import Util.DataConverter;
 import Util.Mensagens;
-import View.components_controlers.*;
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JOptionPane;
-
 /**
  *
  * @author Eduardo
  */
 public class FrameCadastroIdoso extends javax.swing.JFrame {
     
-    private static final String KEY_NOME = "nome";
-    private static final String KEY_DATA_NASCIMENTO = "dataNascimento";
-    private static final String KEY_LOCAL_ORIGEM = "locaOrigem";
-    private static final String KEY_CPF = "cpf";
-    private static final String KEY_RG = "rg";
-    private static final String KEY_OBSERVACOES = "obs";
-    private static final String KEY_NOME_PARENTE = "nomeParente";
-    private static final String KEY_END_PARENTE = "endParente";
-    private static final String KEY_FONE_PARENTE = "foneParente";
-    private static final String KEY_QUARTO = "quarto";
-    private static final String KEY_CONSULTA = "consulta";
-    //COMPONENTES DO QUARTO
-    private static final String KEY_NUM_QUARTO = "numQuarto";
-    private static final String KEY_NUM_ANDAR = "numAndar";
-    private static final String KEY_CAPACIDADE = "capacidade";
-    private static final String KEY_ESTADO = "estado";
-    
-    // COMPONENTES DA ABA DE CADASTRO
-    private HashMap<String, ComponentControler> componentesCadastro;
-    private ArrayList<Input> entradasCadastro;
-    
-    // COMPONENTES DA ABA DE EDIÇÃO
-    private ComboBoxControler consulta;
-    private HashMap<String, ComponentControler> componentesEdicao;
-    private ArrayList<Input> entradasEdicao;
     private Idoso idoso;
+    
+    private Quarto quarto;
     
     /**
      * Creates new form FrameCadastroIdoso
      */
     public FrameCadastroIdoso() {
         initComponents();
-        componentesCadastro = new HashMap<>();
-        componentesEdicao = new HashMap<>();
-        entradasCadastro = new ArrayList<>();
-        entradasEdicao = new ArrayList<>();
-        TextFieldControler nome = new TextFieldControler(campoNome);
-        componentesCadastro.put(KEY_NOME, nome);
-        entradasCadastro.add(nome);
-        DateFieldControler dataNasc = new DateFieldControler(campoDataNascimento);
-        componentesCadastro.put(KEY_DATA_NASCIMENTO, dataNasc);
-        entradasCadastro.add(dataNasc);
-        TextFieldControler local = new TextFieldControler(campoLocOrigem);
-        componentesCadastro.put(KEY_LOCAL_ORIGEM, local);
-        entradasCadastro.add(local);
-        CPFFieldControler cpf = new CPFFieldControler(campoCPF);
-        componentesCadastro.put(KEY_CPF, cpf);
-        entradasCadastro.add(cpf);
-        IntegerFieldContoler rg = new IntegerFieldContoler(campoRG);
-        componentesCadastro.put(KEY_RG, rg);
-        entradasCadastro.add(rg);
-        TextAreaControler obs = new TextAreaControler(areaObservacoes);
-        componentesCadastro.put(KEY_OBSERVACOES, obs);
-        entradasCadastro.add(obs);
-        TextFieldControler nomeParente = new TextFieldControler(campoNomeParente);
-        componentesCadastro.put(KEY_NOME_PARENTE, nomeParente);
-        entradasCadastro.add(nomeParente);
-        TextFieldControler end = new TextFieldControler(campoEnderecoParente);
-        componentesCadastro.put(KEY_END_PARENTE, end);
-        entradasCadastro.add(end);
-        FoneFieldControler fone = new FoneFieldControler(campoFoneParente);
-        componentesCadastro.put(KEY_FONE_PARENTE, fone);
-        entradasCadastro.add(fone);
-        ComboBoxControler quarto = new ComboBoxControler(comboBoxQuarto);
-        componentesCadastro.put(KEY_QUARTO, quarto);
-        entradasCadastro.add(quarto);
         try {
             List<Quarto> lista = ImplQuartoDAO.getInstance().encontrarTodos();
             if(lista != null) {
                 for (Iterator<Quarto> it = lista.iterator(); it.hasNext();) {
                     Quarto q = it.next();
-                    quarto.setValue(q);
+                    comboBoxQuarto.addItem(q);
+                    comboBoxQuartoEdicao.addItem(q);
                 }
             }
         }catch(Exception ex) {
             ex.printStackTrace();
-        }
-        
-        componentesCadastro.put(KEY_NUM_QUARTO, new LabelControler(labelNumQuarto));
-        componentesCadastro.put(KEY_NUM_ANDAR, new LabelControler(labelNumAndar));
-        componentesCadastro.put(KEY_CAPACIDADE, new LabelControler(labelEspacoDisponivel));
-        componentesCadastro.put(KEY_ESTADO, new LabelControler(labelEstado));
-        
-        
-        consulta = new ComboBoxControler(comboBoxIdoso);
-        componentesEdicao.put(KEY_CONSULTA, consulta);
-        TextFieldControler nomeE = new TextFieldControler(campoNomeEdicao);
-        componentesEdicao.put(KEY_NOME, nomeE);
-        entradasEdicao.add(nomeE);
-        DateFieldControler dataNascE = new DateFieldControler(campoDataNascimentoEdicao);
-        componentesEdicao.put(KEY_DATA_NASCIMENTO, dataNascE);
-        entradasEdicao.add(dataNascE);
-        TextFieldControler localE = new TextFieldControler(campoLocOrigemEdicao);
-        componentesEdicao.put(KEY_LOCAL_ORIGEM, localE);
-        entradasEdicao.add(localE);
-        CPFFieldControler cpfE = new CPFFieldControler(campoCPFEdicao);
-        componentesEdicao.put(KEY_CPF, cpfE);
-        entradasEdicao.add(cpfE);
-        IntegerFieldContoler rgE = new IntegerFieldContoler(campoRGEdicao);
-        componentesEdicao.put(KEY_RG, rgE);
-        entradasEdicao.add(rgE);
-        TextAreaControler obsE = new TextAreaControler(areaObservacoesEdicao);
-        componentesEdicao.put(KEY_OBSERVACOES, obsE);
-        entradasEdicao.add(obsE);
-        TextFieldControler nomeParenteE = new TextFieldControler(campoNomeParenteEdicao);
-        componentesEdicao.put(KEY_NOME_PARENTE, nomeParenteE);
-        entradasEdicao.add(nomeParenteE);
-        TextFieldControler endE = new TextFieldControler(campoEnderecoParenteEdicao);
-        componentesEdicao.put(KEY_END_PARENTE, endE);
-        entradasEdicao.add(endE);
-        FoneFieldControler foneE = new FoneFieldControler(campoFoneParenteEdicao);
-        componentesEdicao.put(KEY_FONE_PARENTE, foneE);
-        entradasEdicao.add(foneE);
-        ComboBoxControler quartoE = new ComboBoxControler(comboBoxQuartoEdicao);
-        componentesEdicao.put(KEY_QUARTO, quartoE);
-        entradasEdicao.add(quartoE);    
-    }
-    
-    
-    private boolean validaCadastro() {
-        for (Iterator<Input> it = entradasCadastro.iterator(); it.hasNext();) {
-            Input input = it.next();
-            if(! input.isValid()) return false;
-        }
-        Quarto q = (Quarto)componentesCadastro.get(KEY_QUARTO).getValue();
-        if((q.getCapacidade() - 1) < 0) return false; 
-        return true;
-    }
-    
-    private boolean validaEdicao() {
-        for (Iterator<Input> it = entradasEdicao.iterator(); it.hasNext();) {
-            Input input = it.next();
-            if(! input.isValid()) return false;
-        }
-        Quarto q = (Quarto)componentesEdicao.get(KEY_QUARTO).getValue();
-        if((q.getCapacidade() - 1) < 0) return false; 
-        return true;
+        }  
     }
     
     private void limparCadastro() {
-        for (Iterator<ComponentControler> it = componentesCadastro.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        areaObservacoes.setText("");
+        campoCPF.setText("");
+        campoDataNascimento.setText("");
+        campoEnderecoParente.setText("");
+        campoFoneParente.setText("");
+        campoLocOrigem.setText("");
+        campoNome.setText("");
+        campoNomeParente.setText("");
+        campoRG.setText("");
         checkBoxAcamado.setSelected(false);
+        comboBoxQuarto.setSelectedIndex(0);
     }
     
     private void limparEdicao() {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        areaObservacoesEdicao.setText("");
+        campoCPFEdicao.setText("");
+        campoDataNascimentoEdicao.setText("");
+        campoEnderecoParenteEdicao.setText("");
+        campoFoneParenteEdicao.setText("");
+        campoLocOrigemEdicao.setText("");
+        campoNomeEdicao.setText("");
+        campoNomeParenteEdicao.setText("");
+        campoRGEdicao.setText("");
+        checkBoxAcamado.setSelected(false);
+        comboBoxQuartoEdicao.setSelectedIndex(0);
+        habilitado(false);
     }
     
     private void habilitado(boolean flag) {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.habilitado(flag);
-        }
+        areaObservacoesEdicao.setEnabled(flag);
+        campoCPFEdicao.setEnabled(flag);
+        campoDataNascimentoEdicao.setEnabled(flag);
+        campoEnderecoParenteEdicao.setEnabled(flag);
+        campoFoneParenteEdicao.setEnabled(flag);
+        campoLocOrigemEdicao.setEnabled(flag);
+        campoNomeEdicao.setEnabled(flag);
+        campoNomeParenteEdicao.setEnabled(flag);
+        campoRGEdicao.setEnabled(flag);
+        comboBoxQuartoEdicao.setEnabled(flag);
+        botaoSalvar.setEnabled(flag);
     }
     
     /**
@@ -397,11 +293,19 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
 
         jLabel11.setText("N° do Quarto:");
 
+        labelNumQuarto.setText(" ");
+
         jLabel12.setText("N° do Andar:");
+
+        labelNumAndar.setText(" ");
 
         jLabel14.setText("Espaço disponível (quantidade de pessoas):");
 
+        labelEspacoDisponivel.setText(" ");
+
         jLabel16.setText("Estado:");
+
+        labelEstado.setText(" ");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -410,24 +314,26 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(comboBoxQuarto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
-                            .addComponent(jLabel12))
-                        .addGap(148, 148, 148)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelNumAndar)
-                            .addComponent(labelNumQuarto)))
+                        .addComponent(jLabel16)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labelEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel14)
-                            .addComponent(jLabel16))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelEstado)
-                            .addComponent(labelEspacoDisponivel))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLabel14)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labelEspacoDisponivel, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labelNumAndar, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(comboBoxQuarto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labelNumQuarto, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -482,7 +388,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                     .addComponent(campoNomeParente)
                     .addComponent(campoEnderecoParente)
                     .addComponent(campoFoneParente, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE))
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(114, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -529,7 +435,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(44, 44, 44)
                 .addComponent(botaoCadastrar)
@@ -677,7 +583,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                     .addComponent(campoNomeParenteEdicao)
                     .addComponent(campoEnderecoParenteEdicao)
                     .addComponent(campoFoneParenteEdicao, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -730,6 +636,16 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel26)
+                            .addComponent(jLabel27))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addComponent(labelEspacoDisponivelEdicao)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(labelEstadoEdicao, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)))
                     .addComponent(comboBoxQuartoEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -738,16 +654,8 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                         .addGap(148, 148, 148)
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(labelNumAndarEdicao)
-                            .addComponent(labelNumQuartoEdicao)))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel26)
-                            .addComponent(jLabel27))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelEstadoEdicao)
-                            .addComponent(labelEspacoDisponivelEdicao))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(labelNumQuartoEdicao))))
+                .addContainerGap())
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -777,6 +685,11 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
 
         botaoSalvar.setText("Salvar alterações");
         botaoSalvar.setEnabled(false);
+        botaoSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoSalvarActionPerformed(evt);
+            }
+        });
 
         botaoConsultar.setText("Consultar");
         botaoConsultar.addActionListener(new java.awt.event.ActionListener() {
@@ -794,16 +707,16 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, Short.MAX_VALUE)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(17, 17, 17))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(comboBoxIdoso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(botaoConsultar)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(278, 278, 278)
                 .addComponent(botaoSalvar)
@@ -820,7 +733,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(82, 82, 82)
+                        .addGap(76, 76, 76)
                         .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
@@ -834,7 +747,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 718, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -845,60 +758,119 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastrarActionPerformed
-        if(validaCadastro()) {
-            Idoso i = new Idoso();
-            i.setAcamado(checkBoxAcamado.isSelected());
-            i.setCpf((String)componentesCadastro.get(KEY_CPF).getValue());
-            i.setCuidadosEspeciais((String)componentesCadastro.get(KEY_OBSERVACOES).getValue());
-            i.setDataNascimento((Date)componentesCadastro.get(KEY_DATA_NASCIMENTO).getValue());
-            i.setEndParente((String)componentesCadastro.get(KEY_END_PARENTE).getValue());
-            i.setLocalOrigem((String)componentesCadastro.get(KEY_LOCAL_ORIGEM).getValue());
-            i.setNomeIdoso((String)componentesCadastro.get(KEY_NOME).getValue());
-            i.setNomeParenteResponsavel((String)componentesCadastro.get(KEY_NOME_PARENTE).getValue());
-            i.setNumTelefoneParente((String)componentesCadastro.get(KEY_FONE_PARENTE).getValue());
-            i.setRg((int)componentesCadastro.get(KEY_RG).getValue());
-            try {
-                ImplIdosoDAO.getInstance().inserir(i);
-                Quarto q = (Quarto) componentesCadastro.get(KEY_QUARTO).getValue();
-                q.setCapacidade(q.getCapacidade() - 1);
-                if(q.getCapacidade() == 0) {
-                    q.setEstado(Quarto.ESTADO_INDISPONIVEL);
-                }
-                ImplQuartoDAO.getInstance().atualizar(q);
-                limparCadastro();
-                Mensagens.cadastradoComSucesso(this);
-            } catch(DAOException ex) {
-                ex.printStackTrace();
-            }
+        Idoso i = new Idoso();
+        i.setAcamado(checkBoxAcamado.isSelected());
+        if(ComponentValidator.cpf(campoCPF)) {
+            i.setCpf(campoCPF.getText());
         }
         else {
-            Mensagens.camposInvalidos(this);
+            Mensagens.campoInvalido(this, "Campo CPF");
+            return;
+        }
+        if(!areaObservacoes.getText().equals("")) {
+            i.setCuidadosEspeciais(areaObservacoes.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Cudados Especiais");
+            return;
+        }
+        if(ComponentValidator.date(campoDataNascimento)) {
+            i.setDataNascimento(DataConverter.stringTypeToSQLDate(campoDataNascimento.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Data de Nascimento");
+            return;
+        }
+        if(!campoEnderecoParente.getText().equals("")) {
+            i.setEndParente(campoEnderecoParente.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Endereço do Parente Responsável");
+            return;
+        }
+        if(!campoLocOrigem.getText().equals("")) {
+            i.setLocalOrigem(campoLocOrigem.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Local de Origem");
+            return;
+        }
+        if(!campoNome.getText().equals("")) {
+            i.setNomeIdoso(campoNome.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Nome");
+            return;
+        }
+        if(!campoNomeParente.getText().equals("")) {
+            i.setNomeParenteResponsavel(campoNomeParente.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Nome do Parente Responsável");
+            return;
+        }
+        if(ComponentValidator.fone(campoFoneParente)) {
+            i.setNumTelefoneParente(campoFoneParente.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Telefone do Parente Responsável");
+            return;
+        }
+        if(ComponentValidator.rg(campoRG)) {
+            i.setRg(Integer.parseInt(campoRG.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo RG");
+            return;
+        }
+        if(comboBoxQuarto.getSelectedIndex() == 0) {
+            Mensagens.campoInvalido(this, "Campo Quarto");
+            return;
+        }
+        try {
+            ImplIdosoDAO.getInstance().inserir(i);
+            Quarto q = (Quarto) comboBoxQuarto.getSelectedItem();
+            q.setCapacidade(q.getCapacidade() - 1);
+            if(q.getCapacidade() == 0) {
+                q.setEstado(Quarto.ESTADO_INDISPONIVEL);
+            }
+            ImplQuartoDAO.getInstance().atualizar(q);
+            limparCadastro();
+            Mensagens.cadastradoComSucesso(this);
+        } catch(DAOException ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
 
     private void comboBoxQuartoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxQuartoActionPerformed
-        if(((Input)componentesCadastro.get(KEY_QUARTO)).isValid()) {
-            Quarto q = (Quarto) componentesCadastro.get(KEY_QUARTO).getValue();
-            componentesCadastro.get(KEY_NUM_QUARTO).setValue(q.getNumQuarto());
-            componentesCadastro.get(KEY_NUM_ANDAR).setValue(q.getNumAndar());
-            componentesCadastro.get(KEY_CAPACIDADE).setValue(q.getCapacidade());
-            componentesCadastro.get(KEY_ESTADO).setValue(q.getEstado());
+        if(comboBoxQuarto.getSelectedIndex() != 0) {
+            Quarto q = (Quarto) comboBoxQuarto.getSelectedItem();
+            labelNumQuarto.setText(q.getNumQuarto() + "");
+            labelNumAndar.setText(q.getNumAndar() + "");
+            labelEspacoDisponivel.setText(q.getCapacidade() + "");
+            labelEstado.setText(q.getEstado() + "");
         }
         else {
-            componentesCadastro.get(KEY_NUM_QUARTO).limpar();
-            componentesCadastro.get(KEY_NUM_ANDAR).limpar();
-            componentesCadastro.get(KEY_CAPACIDADE).limpar();
-            componentesCadastro.get(KEY_ESTADO).limpar();
+            labelNumQuarto.setText("");
+            labelNumAndar.setText("");
+            labelEspacoDisponivel.setText("");
+            labelEstado.setText("");
         }
     }//GEN-LAST:event_comboBoxQuartoActionPerformed
 
     private void comboBoxQuartoEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxQuartoEdicaoActionPerformed
-        if(((Input)componentesEdicao.get(KEY_QUARTO)).isValid()) {
-            Quarto q = (Quarto) componentesEdicao.get(KEY_QUARTO).getValue();
-            componentesEdicao.get(KEY_NUM_QUARTO).setValue(q.getNumQuarto());
-            componentesEdicao.get(KEY_NUM_ANDAR).setValue(q.getNumAndar());
-            componentesEdicao.get(KEY_CAPACIDADE).setValue(q.getCapacidade());
-            componentesEdicao.get(KEY_ESTADO).setValue(q.getEstado());
+        if(comboBoxQuartoEdicao.getSelectedIndex() != 0) {
+            Quarto q = (Quarto) comboBoxQuartoEdicao.getSelectedItem();
+            labelNumQuartoEdicao.setText(q.getNumQuarto() + "");
+            labelNumAndarEdicao.setText(q.getNumAndar() + "");
+            labelEspacoDisponivelEdicao.setText(q.getCapacidade() + "");
+            labelEstadoEdicao.setText(q.getEstado() + "");
+        }
+        else {
+            labelNumQuartoEdicao.setText("");
+            labelNumAndarEdicao.setText("");
+            labelEspacoDisponivelEdicao.setText("");
+            labelEstadoEdicao.setText("");
         }
     }//GEN-LAST:event_comboBoxQuartoEdicaoActionPerformed
 
@@ -921,39 +893,118 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
     private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
-        if(consulta.isValid()) {
-            try {
-                idoso = ImplIdosoDAO.getInstance().encontrarPorCodigo(((Idoso) consulta.getValue()).getCodIdoso());
-                if(idoso != null) {
-                    habilitado(true);
-                    botaoSalvar.setEnabled(true);
-                    componentesCadastro.get(KEY_NOME).setValue(idoso.getNomeIdoso());
-                    componentesCadastro.get(KEY_DATA_NASCIMENTO).setValue(idoso.getDataNascimento());
-                    componentesCadastro.get(KEY_LOCAL_ORIGEM).setValue(idoso.getLocalOrigem());
-                    componentesCadastro.get(KEY_CPF).setValue(idoso.getCpf());
-                    componentesCadastro.get(KEY_RG).setValue(idoso.getRg());
-                    componentesCadastro.get(KEY_OBSERVACOES).setValue(idoso.getCuidadosEspeciais());
-                    componentesCadastro.get(KEY_NOME_PARENTE).setValue(idoso.getNomeParenteResponsavel());
-                    componentesCadastro.get(KEY_END_PARENTE).setValue(idoso.getEndParente());
-                    componentesCadastro.get(KEY_FONE_PARENTE).setValue(idoso.getNumTelefoneParente());
-                    //componentesCadastro.get(KEY_QUARTO, quarto);
-
-                    componentesCadastro.get(KEY_NUM_QUARTO);
-                    componentesCadastro.get(KEY_NUM_ANDAR);
-                    componentesCadastro.get(KEY_CAPACIDADE);
-                    componentesCadastro.get(KEY_ESTADO);
-                }
-                else {
-                    Mensagens.naoEncontradoConsulta(this);
-                }
-            } catch(Exception ex) {
-                ex.printStackTrace();
+        try {
+            idoso = ImplIdosoDAO.getInstance().encontrarPorCodigo(((Idoso) comboBoxIdoso.getSelectedItem()).getCodIdoso());
+            if(idoso != null) {
+                habilitado(true);
+                campoCPFEdicao.setText(idoso.getCpf());
+                campoDataNascimentoEdicao.setText(idoso.getCpf());
+                campoEnderecoParenteEdicao.setText(idoso.getCpf());
+                campoFoneParenteEdicao.setText(idoso.getCpf());
+                campoLocOrigemEdicao.setText(idoso.getCpf());
+                campoNomeEdicao.setText(idoso.getCpf());
+                campoNomeParenteEdicao.setText(idoso.getCpf());
+                campoRGEdicao.setText(idoso.getCpf());
+                checkBoxAcamadoEdicao.setText(idoso.getCpf());
+                // comboBoxQuartoEdicao.setSelectedItem(idoso.getQuarto);
+                // quarto = idoso.getQuarto();
             }
-        }
-        else {
-            Mensagens.camposInvalidos(this);
+            else {
+                Mensagens.naoEncontradoConsulta(this);
+            }
+        } catch(Exception ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoConsultarActionPerformed
+
+    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
+        Idoso i = new Idoso();
+        i.setAcamado(checkBoxAcamadoEdicao.isSelected());
+        if(ComponentValidator.cpf(campoCPFEdicao)) {
+            i.setCpf(campoCPFEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo CPF");
+            return;
+        }
+        if(!areaObservacoesEdicao.getText().equals("")) {
+            i.setCuidadosEspeciais(areaObservacoesEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Cudados Especiais");
+            return;
+        }
+        if(ComponentValidator.date(campoDataNascimentoEdicao)) {
+            i.setDataNascimento(DataConverter.stringTypeToSQLDate(campoDataNascimentoEdicao.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Data de Nascimento");
+            return;
+        }
+        if(!campoEnderecoParenteEdicao.getText().equals("")) {
+            i.setEndParente(campoEnderecoParenteEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Endereço do Parente Responsável");
+            return;
+        }
+        if(!campoLocOrigemEdicao.getText().equals("")) {
+            i.setLocalOrigem(campoLocOrigemEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Local de Origem");
+            return;
+        }
+        if(!campoNomeEdicao.getText().equals("")) {
+            i.setNomeIdoso(campoNomeEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Nome");
+            return;
+        }
+        if(!campoNomeParenteEdicao.getText().equals("")) {
+            i.setNomeParenteResponsavel(campoNomeParenteEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Nome do Parente Responsável");
+            return;
+        }
+        if(ComponentValidator.fone(campoFoneParenteEdicao)) {
+            i.setNumTelefoneParente(campoFoneParenteEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Telefone do Parente Responsável");
+            return;
+        }
+        if(ComponentValidator.rg(campoRGEdicao)) {
+            i.setRg(Integer.parseInt(campoRGEdicao.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo RG");
+            return;
+        }
+        if(comboBoxQuartoEdicao.getSelectedIndex() == 0) {
+            Mensagens.campoInvalido(this, "Campo Quarto");
+            return;
+        }
+        try {
+            ImplIdosoDAO.getInstance().atualizar(i);
+            quarto.setCapacidade(quarto.getCapacidade() + 1);
+            quarto.setEstado(Quarto.ESTADO_DISPONIVEL);
+            Quarto q = (Quarto) comboBoxQuartoEdicao.getSelectedItem();
+            q.setCapacidade(q.getCapacidade() - 1);
+            if(q.getCapacidade() == 0) {
+                q.setEstado(Quarto.ESTADO_INDISPONIVEL);
+            }
+            ImplQuartoDAO.getInstance().atualizar(quarto);
+            ImplQuartoDAO.getInstance().atualizar(q);
+            quarto = q;
+            limparEdicao();
+            Mensagens.alteradoComSucesso(this);
+        } catch(DAOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_botaoSalvarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -10,6 +10,8 @@ package Model;
  */
 public class ItemPrescricaoMedica {
     
+    private int cod;
+    
     private PrescricaoMedica prescricao;
     private int numeroRemedio;
     private Remedio remedio;
@@ -84,11 +86,22 @@ public class ItemPrescricaoMedica {
         this.hora = hora;
     }
 
+    public int getCod() {
+        return cod;
+    }
+
+    public void setCod(int cod) {
+        this.cod = cod;
+    }
+    
+    
+
     @Override
     public boolean equals(Object o) {
         if(o instanceof ItemPrescricaoMedica) {
             ItemPrescricaoMedica iC = (ItemPrescricaoMedica) o;
-            return this.numeroRemedio == iC.getNumeroRemedio();
+            return this.numeroRemedio == iC.getNumeroRemedio() && 
+                   this.cod == iC.getCod();
         }
         else {
             throw new IllegalArgumentException();

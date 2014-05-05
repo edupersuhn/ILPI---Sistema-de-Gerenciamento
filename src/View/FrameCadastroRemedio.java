@@ -9,15 +9,10 @@ package View;
 import Control.Impl.Exception.DAOException;
 import Control.Impl.ImplRemedioDAO;
 import Model.Remedio;
+import Util.ComponentValidator;
 import Util.Mensagens;
-import View.components_controlers.ComponentControler;
-import View.components_controlers.Input;
-import View.components_controlers.IntegerFieldContoler;
-import View.components_controlers.TextFieldControler;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import javax.swing.JComponent;
+import java.util.List;
 
 /**
  *
@@ -25,17 +20,6 @@ import javax.swing.JComponent;
  */
 public class FrameCadastroRemedio extends javax.swing.JFrame {
     
-    // COMPONENTES DA ABA DE CADASTRO
-    private static final String KEY_NOME = "nome";
-    private static final String KEY_QTD_ESTOQUE = "qtdEstoque";
-    private static final String KEY_UNIDADE_MEDIDA = "unidadeMedida";
-    private HashMap<String, ComponentControler> componentesCadastro;
-    private ArrayList<Input> entradasCadastro;
-    
-    // COMPONENTES DA ABA DE EDIÇÃO
-    private TextFieldControler consulta;
-    private HashMap<String, ComponentControler> componentesEdicao;
-    private ArrayList<Input> entradasEdicao;
     private Remedio remedio;
     
     /**
@@ -43,68 +27,27 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
      */
     public FrameCadastroRemedio() {
         initComponents();
-        componentesCadastro = new HashMap<>();
-        componentesEdicao = new HashMap<>();
-        entradasCadastro = new ArrayList<>();
-        entradasEdicao = new ArrayList<>();
-        TextFieldControler nome = new TextFieldControler(campoNome);
-        componentesCadastro.put(KEY_NOME, nome);
-        entradasCadastro.add(nome);
-        IntegerFieldContoler estoque = new IntegerFieldContoler(campoQntEstoque);
-        componentesCadastro.put(KEY_QTD_ESTOQUE, estoque);
-        entradasCadastro.add(estoque);
-        TextFieldControler unidadeMedida = new TextFieldControler(campoUnidadeMedida);
-        componentesCadastro.put(KEY_UNIDADE_MEDIDA, unidadeMedida);
-        entradasCadastro.add(unidadeMedida);
-        
-        consulta = new TextFieldControler(campoConsulta);
-        TextFieldControler nomeE = new TextFieldControler(campoNomeEdicao);
-        componentesEdicao.put(KEY_NOME, nomeE);
-        entradasEdicao.add(nomeE);
-        IntegerFieldContoler estoqueE = new IntegerFieldContoler(campoQntEstoqueEdicao);
-        componentesEdicao.put(KEY_QTD_ESTOQUE, estoqueE);
-        entradasEdicao.add(estoqueE);
-        TextFieldControler unidadeMedidaE = new TextFieldControler(campoUnidadeMedidaEdicao);
-        componentesEdicao.put(KEY_UNIDADE_MEDIDA, unidadeMedidaE);
-        entradasEdicao.add(unidadeMedidaE);
-    }
-    
-    private boolean validaCadastro() {
-        for (Iterator<Input> it = entradasCadastro.iterator(); it.hasNext();) {
-            Input input = it.next();
-            System.out.println("Valido : " + input.isValid());
-            if(! input.isValid()) return false;
-        }
-        return true;
-    }
-    
-    private boolean validaEdicao() {
-        for (Iterator<Input> it = entradasEdicao.iterator(); it.hasNext();) {
-            Input input = it.next();
-            if(! input.isValid()) return false;
-        }
-        return true;
     }
     
     private void limparCadastro() {
-        for (Iterator<ComponentControler> it = componentesCadastro.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        campoNome.setText("");
+        campoQntEstoque.setText("");
+        campoUnidadeMedida.setText("");
     }
     
     private void limparEdicao() {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        campoNomeEdicao.setText("");
+        campoQntEstoqueEdicao.setText("");
+        campoUnidadeMedidaEdicao.setText("");
+        comboBoxRemedio.setSelectedIndex(0);
+        habilitado(false);
     }
     
     private void habilitado(boolean flag) {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.habilitado(flag);
-        }
+        campoNomeEdicao.setEnabled(flag);
+        campoQntEstoqueEdicao.setEnabled(flag);
+        campoUnidadeMedidaEdicao.setEnabled(flag);
+        botaoSalvar.setEnabled(flag);
     }
     
     /**
@@ -127,9 +70,6 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
         campoNome = new javax.swing.JTextField();
         campoUnidadeMedida = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        campoConsulta = new javax.swing.JTextField();
-        botaoConsultar = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
@@ -137,12 +77,20 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
         campoQntEstoqueEdicao = new javax.swing.JFormattedTextField();
         campoNomeEdicao = new javax.swing.JTextField();
         botaoSalvar = new javax.swing.JButton();
+        comboBoxRemedio = new javax.swing.JComboBox();
+        botaoConsultar = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("CadastroRemedio");
         setResizable(false);
+
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
 
         jLabel2.setText("Quantidade em estoque:");
 
@@ -177,7 +125,7 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
                             .addComponent(campoNome)
                             .addComponent(campoQntEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(campoUnidadeMedida, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -194,21 +142,12 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(campoUnidadeMedida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
                 .addComponent(botaoCadastrar)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("Cadastro", jPanel1);
-
-        jLabel4.setText("Nome do remédio:");
-
-        botaoConsultar.setText("Consultar");
-        botaoConsultar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoConsultarActionPerformed(evt);
-            }
-        });
 
         jLabel8.setText("Nome:");
 
@@ -231,6 +170,15 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
             }
         });
 
+        comboBoxRemedio.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione remédio" }));
+
+        botaoConsultar.setText("Consultar");
+        botaoConsultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoConsultarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -238,32 +186,32 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(botaoSalvar)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(campoNomeEdicao)
-                            .addComponent(campoQntEstoqueEdicao, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-                            .addComponent(campoUnidadeMedidaEdicao, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-                            .addComponent(campoConsulta))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(botaoSalvar)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(campoNomeEdicao)
+                                .addComponent(campoQntEstoqueEdicao, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+                                .addComponent(campoUnidadeMedidaEdicao, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(comboBoxRemedio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(botaoConsultar)))
-                .addGap(95, 95, 95))
+                .addGap(184, 184, 184))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(campoConsulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(comboBoxRemedio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoConsultar))
-                .addGap(18, 18, 18)
+                .addGap(19, 19, 19)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(campoNomeEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -286,7 +234,7 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -297,93 +245,118 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastrarActionPerformed
-        if(validaCadastro()) {
-            Remedio r = new Remedio();
-            r.setNomeRemedio((String) componentesCadastro.get(KEY_NOME).getValue());
-            r.setQtdEstoque((int) componentesCadastro.get(KEY_QTD_ESTOQUE).getValue());
-            r.setUnidadeMedida((String) componentesCadastro.get(KEY_UNIDADE_MEDIDA).getValue());
-            try {
-                ImplRemedioDAO.getInstance().inserir(r);
-                limparCadastro();
-                Mensagens.cadastradoComSucesso(this);
-            } catch(DAOException ex) {
-                ex.printStackTrace();
-            }
+        Remedio r = new Remedio();
+        if(!campoNome.getText().equals("")) {
+            r.setNomeRemedio(campoNome.getText());
         }
         else {
-            Mensagens.camposInvalidos(this);
+            Mensagens.campoInvalido(this, "Campo Nome");
+            return;
+        }
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoQntEstoque)) {
+            r.setQtdEstoque(Integer.parseInt(campoQntEstoque.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Quantidade em Estoque");
+            return;
+        }
+        if(!campoUnidadeMedida.getText().equals("")) {
+            r.setUnidadeMedida(campoUnidadeMedida.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Unidade de Medida");
+            return;
+        }
+        try {
+            ImplRemedioDAO.getInstance().inserir(r);
+            limparCadastro();
+            Mensagens.cadastradoComSucesso(this);
+        } catch(DAOException ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
 
-    private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
-        if(consulta.isValid()) {
+    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
+        Remedio r = new Remedio();
+        if(!campoNome.getText().equals("")) {
+            r.setNomeRemedio(campoNome.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Nome");
+            return;
+        }
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoQntEstoque)) {
+            r.setQtdEstoque(Integer.parseInt(campoQntEstoque.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Quantidade em Estoque");
+            return;
+        }
+        if(!campoUnidadeMedida.getText().equals("")) {
+            r.setUnidadeMedida(campoUnidadeMedida.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Unidade de Medida");
+            return;
+        }
+        try {
+            ImplRemedioDAO.getInstance().atualizar(r);
+            limparCadastro();
+            Mensagens.cadastradoComSucesso(this);
+            habilitado(false);
+        } catch(DAOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_botaoSalvarActionPerformed
+
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        if(jTabbedPane1.getSelectedIndex() == 1) {
             try {
-                remedio = ImplRemedioDAO.getInstance().encontrarPorNome((String) consulta.getValue());
-                if(remedio != null) {
-                    habilitado(true);
-                    botaoSalvar.setEnabled(true);
-                    componentesEdicao.get(KEY_NOME).setValue(remedio.getNomeRemedio());
-                    componentesEdicao.get(KEY_QTD_ESTOQUE).setValue(remedio.getQtdEstoque());
-                    componentesEdicao.get(KEY_UNIDADE_MEDIDA).setValue(remedio.getUnidadeMedida());
-                }
-                else {
-                    Mensagens.naoEncontradoConsulta(this);
+                comboBoxRemedio.removeAllItems();
+                comboBoxRemedio.addItem("Selecione remédio");
+                List<Remedio> lista = ImplRemedioDAO.getInstance().encontrarTodos();
+                if(lista != null) {
+                    for (Iterator<Remedio> it = lista.iterator(); it.hasNext();) {
+                        Remedio r = it.next();
+                        comboBoxRemedio.addItem(r);
+                    }
                 }
             } catch(Exception ex) {
                 ex.printStackTrace();
             }
         }
-        else {
-            Mensagens.camposInvalidos(this);
+    }//GEN-LAST:event_jTabbedPane1StateChanged
+
+    private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
+        try {
+            if(comboBoxRemedio.getSelectedIndex() != 0) {
+                remedio = ImplRemedioDAO.getInstance().encontrarPorNome(((Remedio)comboBoxRemedio.getSelectedItem()).getNomeRemedio());
+                campoNomeEdicao.setText(remedio.getNomeRemedio());
+                campoQntEstoqueEdicao.setText(remedio.getQtdEstoque() + "");
+                campoUnidadeMedidaEdicao.setText(remedio.getUnidadeMedida() + "");
+                habilitado(true);
+            }
+        } catch(Exception ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoConsultarActionPerformed
-
-    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
-        if(validaEdicao()) {
-            if(remedio == null) {
-                Mensagens.nadaParaAlterar(this);
-            }
-            else {
-                try {
-                    Remedio remAtual = new Remedio();
-                    remAtual.setCodigo(remedio.getCodigo());
-                    remAtual.setNomeRemedio((String) componentesEdicao.get(KEY_NOME).getValue());
-                    remAtual.setQtdEstoque((int) componentesEdicao.get(KEY_QTD_ESTOQUE).getValue());
-                    remAtual.setUnidadeMedida((String) componentesEdicao.get(KEY_UNIDADE_MEDIDA).getValue());
-                    ImplRemedioDAO.getInstance().atualizar(remAtual);
-                    Mensagens.alteradoComSucesso(this);
-                    consulta.limpar();
-                    limparEdicao();
-                    remedio = null;
-                    habilitado(false);
-                    botaoSalvar.setEnabled(false);
-                } catch(Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-        else {
-            Mensagens.camposInvalidos(this);
-        }
-    }//GEN-LAST:event_botaoSalvarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botaoCadastrar;
     private javax.swing.JButton botaoConsultar;
     private javax.swing.JButton botaoSalvar;
-    private javax.swing.JTextField campoConsulta;
     private javax.swing.JTextField campoNome;
     private javax.swing.JTextField campoNomeEdicao;
     private javax.swing.JFormattedTextField campoQntEstoque;
     private javax.swing.JFormattedTextField campoQntEstoqueEdicao;
     private javax.swing.JTextField campoUnidadeMedida;
     private javax.swing.JTextField campoUnidadeMedidaEdicao;
+    private javax.swing.JComboBox comboBoxRemedio;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;

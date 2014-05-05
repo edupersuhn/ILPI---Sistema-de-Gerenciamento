@@ -6,57 +6,36 @@
 
 package View;
 
-import Control.Impl.Exception.DAOException;
-import Control.Impl.ImplCardapioDAO;
 import Control.Impl.ImplIdosoDAO;
-import Control.Impl.ImplItemCardapioDAO;
 import Control.Impl.ImplItemPrescricaoMedica;
 import Control.Impl.ImplPrescricaoMedica;
 import Control.Impl.ImplRemedioDAO;
-import Model.Alimento;
-import Model.Cardapio;
 import Model.Idoso;
-import Model.ItemCardapio;
 import Model.ItemPrescricaoMedica;
 import Model.PrescricaoMedica;
-import Model.Quarto;
 import Model.Remedio;
-import Util.DataValidator;
-import View.components_controlers.*;
+import Util.ComponentValidator;
+import Util.DataConverter;
+import Util.Mensagens;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 
 /**
  *
  * @author Eduardo
  */
 public class FrameCadastroPrescricao extends javax.swing.JFrame {
-
-    private static final String KEY_IDOSO = "idoso";
-    private static final String KEY_DATA = "data";
-    private static final String KEY_ID = "identificacao";
-    private static final String KEY_REMEDIO = "remedio";
-    private static final String KEY_HORARIO = "horario";
-    private static final String KEY_QUANTIDADE = "quantidade";
-    private static final String KEY_OBS = "observacao";
-    private static final String KEY_UNIDADE_MEDIDA = "unidadeMedida";
     
     private ArrayList<ItemPrescricaoMedica> listaItens;
+    private ArrayList<ItemPrescricaoMedica> listaItensEdicao;
     private PrescricaoMedica prescricao;
     
-    // COMPONENTES DA ABA DE CADASTRO
-    private HashMap<String, ComponentControler> componentesCadastro;
-    private ArrayList<Input> entradasCadastro;
+    private int cod = 0;
+    private int codEdicao = 0;
     
-    // COMPONENTES DA ABA DE EDIÇÃO
-    private ComboBoxControler consulta;
-    private HashMap<String, ComponentControler> componentesEdicao;
-    private ArrayList<Input> entradasEdicao;
     private Idoso idoso;
     
     
@@ -66,39 +45,14 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
     public FrameCadastroPrescricao() {
         initComponents();
         listaItens = new ArrayList<>();
-        componentesCadastro = new HashMap<>();
-        componentesEdicao = new HashMap<>();
-        entradasCadastro = new ArrayList<>();
-        entradasEdicao = new ArrayList<>();
-        ComboBoxControler idoso = new ComboBoxControler(comboBoxIdoso);
-        componentesCadastro.put(KEY_IDOSO, idoso);
-        entradasCadastro.add(idoso);
-        DateFieldControler data = new DateFieldControler(campoData);
-        componentesCadastro.put(KEY_DATA, data);
-        entradasCadastro.add(data);
-        TextFieldControler id = new TextFieldControler(campoID);
-        componentesCadastro.put(KEY_ID, id);
-        entradasCadastro.add(id);
-        ComboBoxControler remedio = new ComboBoxControler(comboBoxRemedio);
-        componentesCadastro.put(KEY_REMEDIO, remedio);
-        entradasCadastro.add(remedio);
-        TimeFieldControler hora = new TimeFieldControler(campoHora);
-        componentesCadastro.put(KEY_HORARIO, hora);
-        entradasCadastro.add(hora);
-        IntegerFieldContoler qtd = new IntegerFieldContoler(campoQuantidade);
-        componentesCadastro.put(KEY_QUANTIDADE, qtd);
-        entradasCadastro.add(qtd);
-        TextAreaControler obs = new TextAreaControler(areaObs);
-        componentesCadastro.put(KEY_OBS, obs);
-        entradasCadastro.add(obs);
-        componentesCadastro.put(KEY_UNIDADE_MEDIDA, new LabelControler(labelUnidadeMedida));
-        
+        listaItensEdicao = new ArrayList<>();
         try {
             List<Idoso> listaI = ImplIdosoDAO.getInstance().encontrarTodosIdosos();
             if(listaI != null) {
                 for (Iterator<Idoso> it = listaI.iterator(); it.hasNext();) {
                     Idoso i = it.next();
                     comboBoxIdoso.addItem(i);
+                    comboBoxIdosoEdicao.addItem(i);
                 }
             }
             List<Remedio> listaR = ImplRemedioDAO.getInstance().encontrarTodos();
@@ -106,89 +60,61 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
                 for (Iterator<Remedio> it = listaR.iterator(); it.hasNext();) {
                     Remedio r = it.next();
                     comboBoxRemedio.addItem(r);
+                    comboBoxRemedioEdicao.addItem(r);
                 }
             }
         } catch(Exception ex) {
             ex.printStackTrace();
         }
         
-        ComboBoxControler idosoE = new ComboBoxControler(comboBoxIdosoEdicao);
-        componentesEdicao.put(KEY_IDOSO, idosoE);
-        entradasEdicao.add(idosoE);
-        DateFieldControler dataE = new DateFieldControler(campoDataEdicao);
-        componentesEdicao.put(KEY_DATA, dataE);
-        entradasEdicao.add(dataE);
-        TextFieldControler idE = new TextFieldControler(campoIDEdicao);
-        componentesEdicao.put(KEY_ID, idE);
-        entradasEdicao.add(idE);
-        ComboBoxControler remedioE = new ComboBoxControler(comboBoxRemedioEdicao);
-        componentesEdicao.put(KEY_REMEDIO, remedioE);
-        entradasEdicao.add(remedioE);
-        TimeFieldControler horaE = new TimeFieldControler(campoHoraEdicao);
-        componentesEdicao.put(KEY_HORARIO, horaE);
-        entradasEdicao.add(horaE);
-        IntegerFieldContoler qtdE = new IntegerFieldContoler(campoQuantidadeEdicao);
-        componentesEdicao.put(KEY_QUANTIDADE, qtdE);
-        entradasEdicao.add(qtdE);
-        TextAreaControler obsE = new TextAreaControler(areaObsEdicao);
-        componentesEdicao.put(KEY_OBS, obsE);
-        entradasEdicao.add(obsE);
-        componentesEdicao.put(KEY_UNIDADE_MEDIDA, new LabelControler(labelUnidadeMedidaEdicao));
-    }
-    
-    private boolean validaAdicionar() {
-        return ((Input) componentesCadastro.get(KEY_REMEDIO)).isValid() ||
-                ((Input) componentesCadastro.get(KEY_HORARIO)).isValid() ||
-                ((Input) componentesCadastro.get(KEY_QUANTIDADE)).isValid();
-    }
-    
-    private boolean validaRemover() {
-        return ((Input) componentesCadastro.get(KEY_REMEDIO)).isValid();
-    }
-    
-    private boolean validaCadastro() {
-        return  ((Input) componentesCadastro.get(KEY_IDOSO)).isValid() ||
-                ((Input) componentesCadastro.get(KEY_DATA)).isValid() ||
-                ((Input) componentesCadastro.get(KEY_ID)).isValid() ||
-                !listaItens.isEmpty();
-               
-    }
-    
-    private boolean validaEdicao() {
-        for (Iterator<Input> it = entradasEdicao.iterator(); it.hasNext();) {
-            Input input = it.next();
-            if(! input.isValid()) return false;
-        }
-        return true;
     }
     
     private void limparCadastro() {
-        for (Iterator<ComponentControler> it = componentesCadastro.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        areaObs.setText("");
+        listaPrescricao.removeAll();
+        botaoAdicionar.setText("");
+        botaoRemover.setText("");
+        campoData.setText("");
+        campoHora.setText("");
+        campoID.setText("");
+        campoQuantidade.setText("");
+        comboBoxIdoso.setSelectedIndex(0);
+        comboBoxRemedio.setSelectedIndex(0);
+        checkBoxHoje.setSelected(true);
     }
     
     private void limparEdicao() {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.limpar();
-        }
+        areaObsEdicao.setText("");
+        listaPrescricao.removeAll();
+        botaoAdicionarEdicao.setText("");
+        botaoRemoverEdicao.setText("");
+        campoDataEdicao.setText("");
+        campoHoraEdicao.setText("");
+        campoIDEdicao.setText("");
+        campoQuantidadeEdicao.setText("");
+        comboBoxIdosoEdicao.setSelectedIndex(0);
+        comboBoxRemedioEdicao.setSelectedIndex(0);
+        habilitado(false);
     }
     
     private void habilitado(boolean flag) {
-        for (Iterator<ComponentControler> it = componentesEdicao.values().iterator(); it.hasNext();) {
-            ComponentControler componentControler = it.next();
-            componentControler.habilitado(flag);
-        }
+        areaObsEdicao.setEnabled(flag);
+        listaPrescricaoEdicao.setEnabled(flag);
+        botaoAdicionarEdicao.setEnabled(flag);
+        botaoRemoverEdicao.setEnabled(flag);
+        campoDataEdicao.setEnabled(flag);
+        campoHoraEdicao.setEnabled(flag);
+        campoIDEdicao.setEnabled(flag);
+        campoQuantidadeEdicao.setEnabled(flag);
+        comboBoxRemedioEdicao.setEnabled(flag);
     }
     
     private void atualizaPrescricao() {
-        areaPrescricao.setText("");
-        for (Iterator<ItemPrescricaoMedica> it = listaItens.iterator(); it.hasNext();) {
-            ItemPrescricaoMedica itemPrescricaoMedica = it.next();
-            areaPrescricao.append(itemPrescricaoMedica.toString() + "\n");
-        }
+        listaPrescricao.setListData(listaItens.toArray());
+    }
+    
+    private void atualizaPrescricaoEdicao() {
+        listaPrescricaoEdicao.setListData(listaItensEdicao.toArray());
     }
     
     /**
@@ -214,7 +140,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         labelUnidadeMedida = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        areaPrescricao = new javax.swing.JTextArea();
+        listaPrescricao = new javax.swing.JList();
         botaoCadastrar = new javax.swing.JButton();
         botaoRemover = new javax.swing.JButton();
         botaoAdicionar = new javax.swing.JButton();
@@ -224,13 +150,13 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         campoID = new javax.swing.JTextField();
         campoData = new javax.swing.JFormattedTextField();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        checkBoxHoje = new javax.swing.JCheckBox();
         jPanel4 = new javax.swing.JPanel();
         comboBoxIdosoEdicao = new javax.swing.JComboBox();
         comboBoxPrescricao = new javax.swing.JComboBox();
         jPanel6 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        areaPrescricaoEdicao = new javax.swing.JTextArea();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        listaPrescricaoEdicao = new javax.swing.JList();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
@@ -254,11 +180,22 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         setTitle("Cadastra Prescrição Médica");
         setResizable(false);
 
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
+
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Remedio"));
 
         campoQuantidade.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
 
         comboBoxRemedio.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione remédio" }));
+        comboBoxRemedio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxRemedioActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Quantidade:");
 
@@ -327,10 +264,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Prescrição"));
 
-        areaPrescricao.setColumns(20);
-        areaPrescricao.setRows(5);
-        areaPrescricao.setEnabled(false);
-        jScrollPane3.setViewportView(areaPrescricao);
+        jScrollPane3.setViewportView(listaPrescricao);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -379,8 +313,12 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
-        jCheckBox1.setSelected(true);
-        jCheckBox1.setText("hoje");
+        checkBoxHoje.setText("hoje");
+        checkBoxHoje.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkBoxHojeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -399,7 +337,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
                             .addComponent(campoID, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(comboBoxIdoso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCheckBox1)
+                .addComponent(checkBoxHoje)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
@@ -411,7 +349,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(campoData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox1))
+                    .addComponent(checkBoxHoje))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -450,14 +388,14 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                             .addComponent(botaoAdicionar)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGap(18, 18, 18)
                             .addComponent(botaoRemover)
-                            .addGap(140, 140, 140)))
+                            .addGap(128, 128, 128)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
                 .addComponent(botaoCadastrar)
                 .addContainerGap())
         );
@@ -465,26 +403,28 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         jTabbedPane1.addTab("Cadastro", jPanel3);
 
         comboBoxIdosoEdicao.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione idoso" }));
+        comboBoxIdosoEdicao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxIdosoEdicaoActionPerformed(evt);
+            }
+        });
 
         comboBoxPrescricao.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione prescrição" }));
         comboBoxPrescricao.setEnabled(false);
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Prescrição"));
 
-        areaPrescricaoEdicao.setColumns(20);
-        areaPrescricaoEdicao.setRows(5);
-        areaPrescricaoEdicao.setEnabled(false);
-        jScrollPane1.setViewportView(areaPrescricaoEdicao);
+        jScrollPane5.setViewportView(listaPrescricaoEdicao);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
         );
 
         jLabel6.setText("Data:");
@@ -498,6 +438,11 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
 
         comboBoxRemedioEdicao.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione remédio" }));
         comboBoxRemedioEdicao.setEnabled(false);
+        comboBoxRemedioEdicao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxRemedioEdicaoActionPerformed(evt);
+            }
+        });
 
         jLabel8.setText("Quantidade:");
 
@@ -534,7 +479,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(campoHoraEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 78, Short.MAX_VALUE))
+                        .addGap(0, 69, Short.MAX_VALUE))
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel8Layout.createSequentialGroup()
@@ -544,7 +489,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(labelUnidadeMedidaEdicao))
                             .addComponent(comboBoxRemedioEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(119, Short.MAX_VALUE))))
+                        .addContainerGap(110, Short.MAX_VALUE))))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -584,6 +529,11 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
 
         botaoSalvar.setText("Salvar alterações");
         botaoSalvar.setEnabled(false);
+        botaoSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoSalvarActionPerformed(evt);
+            }
+        });
 
         campoIDEdicao.setEnabled(false);
 
@@ -596,6 +546,11 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
 
         botaoConsultar.setText("Consultar");
         botaoConsultar.setEnabled(false);
+        botaoConsultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoConsultarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -673,7 +628,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -686,44 +641,262 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAdicionarActionPerformed
-        if(validaAdicionar()) {
-            Remedio r = (Remedio) comboBoxRemedio.getSelectedItem();
-            ItemPrescricaoMedica ipm = new ItemPrescricaoMedica();
-            ipm.setHora((String)componentesCadastro.get(KEY_HORARIO).getValue());
-            ipm.setNumeroRemedio(r.getCodigo());
-            ipm.setObservacaoRemedio((String)componentesCadastro.get(KEY_OBS).getValue());
-            ipm.setQtdRemedio((int)componentesCadastro.get(KEY_QUANTIDADE).getValue());
-            ipm.setRemedio(r);
-            listaItens.add(ipm);
-            atualizaPrescricao();
+        Remedio r;
+        if(comboBoxRemedio.getSelectedIndex() != 0) {
+            r = (Remedio) comboBoxRemedio.getSelectedItem();
         }
+        else {
+            Mensagens.campoInvalido(this, "Campo Remedio");
+            return;
+        }
+        ItemPrescricaoMedica ipm = new ItemPrescricaoMedica();
+        if(ComponentValidator.time(campoHora)) {
+            ipm.setHora(campoHora.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Hora");
+            return;
+        }
+        ipm.setNumeroRemedio(r.getCodigo());
+        if(!areaObs.getText().equals("")) {
+            ipm.setObservacaoRemedio(areaObs.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Observações");
+            return;
+        }
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoQuantidade)) {
+            ipm.setQtdRemedio(Integer.parseInt(campoQuantidade.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Quantidade");
+            return;
+        }
+        ipm.setCod(cod++);
+        ipm.setRemedio(r);
+        listaItens.add(ipm);
+        atualizaPrescricao();
     }//GEN-LAST:event_botaoAdicionarActionPerformed
 
     private void botaoRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoRemoverActionPerformed
-        if(validaRemover()) {
-            Remedio r = (Remedio) comboBoxRemedio.getSelectedItem();
-            listaItens.remove(r);
+        if(!listaPrescricao.isSelectionEmpty()) {
+            listaItens.remove((ItemPrescricaoMedica) listaPrescricao.getSelectedValue());
             atualizaPrescricao();
+        }
+        else {
+            Mensagens.campoInvalido(this, "Lista de Remédios");
         }
     }//GEN-LAST:event_botaoRemoverActionPerformed
 
     private void botaoCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastrarActionPerformed
-        
+        PrescricaoMedica prescricao = new PrescricaoMedica();
+        if(comboBoxIdoso.getSelectedIndex() != 0) {
+            prescricao.setIdoso((Idoso) comboBoxIdoso.getSelectedItem());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Idoso");
+            return;
+        }
+        if(ComponentValidator.date(campoData)) {
+            prescricao.setDataPrescricao(DataConverter.stringTypeToSQLDate(campoData.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Data");
+            return;
+        }
+        if(!campoID.getText().equals("")) {
+            //prescricao.setID(campoID.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Identificação");
+            return;
+        }
+        if(listaItens.isEmpty()) {
+            Mensagens.campoInvalido(this, "Prescrição Médica");
+            return;
+        }
+        try {
+            ImplPrescricaoMedica.getInstance().inserir(prescricao);
+            for (Iterator<ItemPrescricaoMedica> it = listaItens.iterator(); it.hasNext();) {
+                ItemPrescricaoMedica itemPrescricaoMedica = it.next();
+                ImplItemPrescricaoMedica.getInstance().inserir(itemPrescricaoMedica);
+            }
+            limparCadastro();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
 
     private void botaoAdicionarEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAdicionarEdicaoActionPerformed
-        // TODO add your handling code here:
+        Remedio r;
+        if(comboBoxRemedioEdicao.getSelectedIndex() != 0) {
+            r = (Remedio) comboBoxRemedioEdicao.getSelectedItem();
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Remedio");
+            return;
+        }
+        ItemPrescricaoMedica ipm = new ItemPrescricaoMedica();
+        if(ComponentValidator.time(campoHoraEdicao)) {
+            ipm.setHora(campoHoraEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Hora");
+            return;
+        }
+        ipm.setNumeroRemedio(r.getCodigo());
+        if(!areaObsEdicao.getText().equals("")) {
+            ipm.setObservacaoRemedio(areaObsEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Observações");
+            return;
+        }
+        if(ComponentValidator.integerNotNegativeAndNotZero(campoQuantidadeEdicao)) {
+            ipm.setQtdRemedio(Integer.parseInt(campoQuantidadeEdicao.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Quantidade");
+            return;
+        }
+        ipm.setCod(codEdicao++);
+        ipm.setRemedio(r);
+        listaItensEdicao.add(ipm);
+        atualizaPrescricaoEdicao();
     }//GEN-LAST:event_botaoAdicionarEdicaoActionPerformed
 
     private void botaoRemoverEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoRemoverEdicaoActionPerformed
-        // TODO add your handling code here:
+        if(!listaPrescricaoEdicao.isSelectionEmpty()) {
+            listaItensEdicao.remove((ItemPrescricaoMedica) listaPrescricaoEdicao.getSelectedValue());
+            atualizaPrescricao();
+        }
+        else {
+            Mensagens.campoInvalido(this, "Lista de Remédios");
+        }
     }//GEN-LAST:event_botaoRemoverEdicaoActionPerformed
+
+    private void checkBoxHojeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxHojeActionPerformed
+        if(checkBoxHoje.isSelected()) {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+            Date hoje = new Date();
+            System.out.println(format.format(hoje));
+            campoData.setText(format.format(hoje));
+        }
+        else {
+            campoData.setText("");
+        }
+    }//GEN-LAST:event_checkBoxHojeActionPerformed
+
+    private void comboBoxIdosoEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxIdosoEdicaoActionPerformed
+        if(comboBoxIdosoEdicao.getSelectedIndex() != 0) {
+            comboBoxPrescricao.setEnabled(true);
+            botaoConsultar.setEnabled(true);
+        }
+        else {
+            comboBoxPrescricao.setEnabled(false);
+            botaoConsultar.setEnabled(false);
+        }
+    }//GEN-LAST:event_comboBoxIdosoEdicaoActionPerformed
+
+    private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
+        prescricao = (PrescricaoMedica) comboBoxPrescricao.getSelectedItem();
+        if(comboBoxPrescricao.getSelectedIndex() != 0) {
+            areaObsEdicao.setText(prescricao.getObservacao());
+            
+            listaItensEdicao = new ArrayList<>();
+            // listaItensEdicao = ImplItemPrescricaoMedica.getInstance().encontrarTodosPrescricao(PrescricaoMedica prescricao);
+            
+            for (Iterator<ItemPrescricaoMedica> it = listaItensEdicao.iterator(); it.hasNext();) {
+                ItemPrescricaoMedica itemPrescricaoMedica = it.next();
+                itemPrescricaoMedica.setCod(codEdicao++);
+            }
+            
+            atualizaPrescricaoEdicao();
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+            campoDataEdicao.setText(format.format(prescricao.getDataPrescricao()));
+            // campoIDEdicao.setText(prescricao.getID());
+            comboBoxRemedioEdicao.setSelectedIndex(0);
+            habilitado(true);
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Prescrição");
+        }
+    }//GEN-LAST:event_botaoConsultarActionPerformed
+
+    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
+        PrescricaoMedica prescricao = new PrescricaoMedica();
+        if(comboBoxIdosoEdicao.getSelectedIndex() != 0) {
+            prescricao.setIdoso((Idoso) comboBoxIdosoEdicao.getSelectedItem());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Idoso");
+            return;
+        }
+        if(ComponentValidator.date(campoDataEdicao)) {
+            prescricao.setDataPrescricao(DataConverter.stringTypeToSQLDate(campoDataEdicao.getText()));
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Data");
+            return;
+        }
+        if(!campoIDEdicao.getText().equals("")) {
+            //prescricao.setID(campoIDEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Identificação");
+            return;
+        }
+        if(listaItensEdicao.isEmpty()) {
+            Mensagens.campoInvalido(this, "Prescrição Médica");
+            return;
+        }
+        try {
+            ImplPrescricaoMedica.getInstance().atualizar(prescricao);
+            for (Iterator<ItemPrescricaoMedica> it = listaItensEdicao.iterator(); it.hasNext();) {
+                ItemPrescricaoMedica itemPrescricaoMedica = it.next();
+                ImplItemPrescricaoMedica.getInstance().atualizar(itemPrescricaoMedica);
+            }
+            limparEdicao();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_botaoSalvarActionPerformed
+
+    private void comboBoxRemedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxRemedioActionPerformed
+        if(comboBoxRemedio.getSelectedIndex() != 0) {
+            labelUnidadeMedida.setText(((Remedio) comboBoxRemedio.getSelectedItem()).getUnidadeMedida());
+        }
+        else {
+            labelUnidadeMedida.setText("U/M");
+        }
+    }//GEN-LAST:event_comboBoxRemedioActionPerformed
+
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        if(jTabbedPane1.getSelectedIndex() == 1) {
+            try {
+                List<PrescricaoMedica> lista = ImplPrescricaoMedica.getInstance().encontrarTodos();
+                for (Iterator<PrescricaoMedica> it = lista.iterator(); it.hasNext();) {
+                    PrescricaoMedica prescricaoMedica = it.next();
+                    comboBoxPrescricao.addItem(prescricaoMedica);
+                }
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jTabbedPane1StateChanged
+
+    private void comboBoxRemedioEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxRemedioEdicaoActionPerformed
+        if(comboBoxRemedioEdicao.getSelectedIndex() != 0) {
+            labelUnidadeMedidaEdicao.setText(((Remedio) comboBoxRemedioEdicao.getSelectedItem()).getUnidadeMedida());
+        }
+        else {
+            labelUnidadeMedidaEdicao.setText("U/M");
+        }
+    }//GEN-LAST:event_comboBoxRemedioEdicaoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea areaObs;
     private javax.swing.JTextArea areaObsEdicao;
-    private javax.swing.JTextArea areaPrescricao;
-    private javax.swing.JTextArea areaPrescricaoEdicao;
     private javax.swing.JButton botaoAdicionar;
     private javax.swing.JButton botaoAdicionarEdicao;
     private javax.swing.JButton botaoCadastrar;
@@ -739,12 +912,12 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
     private javax.swing.JTextField campoIDEdicao;
     private javax.swing.JFormattedTextField campoQuantidade;
     private javax.swing.JFormattedTextField campoQuantidadeEdicao;
+    private javax.swing.JCheckBox checkBoxHoje;
     private javax.swing.JComboBox comboBoxIdoso;
     private javax.swing.JComboBox comboBoxIdosoEdicao;
     private javax.swing.JComboBox comboBoxPrescricao;
     private javax.swing.JComboBox comboBoxRemedio;
     private javax.swing.JComboBox comboBoxRemedioEdicao;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -762,12 +935,14 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel labelUnidadeMedida;
     private javax.swing.JLabel labelUnidadeMedidaEdicao;
+    private javax.swing.JList listaPrescricao;
+    private javax.swing.JList listaPrescricaoEdicao;
     // End of variables declaration//GEN-END:variables
 }
