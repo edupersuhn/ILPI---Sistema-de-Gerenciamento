@@ -898,14 +898,14 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             if(idoso != null) {
                 habilitado(true);
                 campoCPFEdicao.setText(idoso.getCpf());
-                campoDataNascimentoEdicao.setText(idoso.getCpf());
-                campoEnderecoParenteEdicao.setText(idoso.getCpf());
-                campoFoneParenteEdicao.setText(idoso.getCpf());
-                campoLocOrigemEdicao.setText(idoso.getCpf());
-                campoNomeEdicao.setText(idoso.getCpf());
-                campoNomeParenteEdicao.setText(idoso.getCpf());
-                campoRGEdicao.setText(idoso.getCpf());
-                checkBoxAcamadoEdicao.setText(idoso.getCpf());
+                campoDataNascimentoEdicao.setText(DataConverter.sqlDateTypeToString(idoso.getDataNascimento()));
+                campoEnderecoParenteEdicao.setText(idoso.getEndParente());
+                campoFoneParenteEdicao.setText(idoso.getNumTelefoneParente());
+                campoLocOrigemEdicao.setText(idoso.getLocalOrigem());
+                campoNomeEdicao.setText(idoso.getNomeIdoso());
+                campoNomeParenteEdicao.setText(idoso.getNomeParenteResponsavel());
+                campoRGEdicao.setText(idoso.getRg() + "");
+                checkBoxAcamadoEdicao.setSelected(idoso.getAcamado());
                 // comboBoxQuartoEdicao.setSelectedItem(idoso.getQuarto);
                 // quarto = idoso.getQuarto();
             }

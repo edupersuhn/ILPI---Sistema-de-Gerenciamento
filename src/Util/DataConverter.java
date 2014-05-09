@@ -56,4 +56,9 @@ public class DataConverter {
         return data;
     }
     
+    public static String sqlDateTypeToString(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+        return format.format(date);
+    }
+    
 }
