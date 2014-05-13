@@ -5,7 +5,7 @@
 package Control.Impl;
 
 import Control.Impl.Exception.DAOException;
-import Control.Interface.IUsuarioDAO;
+import Control.Interface.IDAO;
 import Model.Funcionario;
 import Model.Usuario;
 import Util.ConectionManager;
@@ -18,7 +18,7 @@ import java.sql.SQLException;
  *
  * @author Bruno
  */
-public class ImplUsuarioDAO implements IUsuarioDAO{
+public class ImplUsuarioDAO implements IDAO<Usuario> {
 
     private static ImplUsuarioDAO instance;
     
@@ -34,22 +34,21 @@ public class ImplUsuarioDAO implements IUsuarioDAO{
     }
     
     @Override
-    public void inserir(Usuario user) throws DAOException {
+    public void inserir(Usuario user) throws DAOException, SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void atualizar(Usuario user) throws DAOException {
+    public void atualizar(Usuario user) throws DAOException, SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void remover(Usuario user) throws DAOException {
+    public void remover(Usuario user) throws DAOException, SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public Usuario encontrarPorCodigo(int codigo) throws DAOException {
+    public Usuario encontrarPorCodigo(int codigo) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -83,20 +82,18 @@ public class ImplUsuarioDAO implements IUsuarioDAO{
                 throw new DAOException("Não foi possível o encontrar Usuario! Cod = " + codigo);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o Usuario.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrar o Usuario! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public Usuario encontrarPorNome(String nomeUsuario) throws DAOException {
+    public Usuario encontrarPorNome(String nomeUsuario) throws DAOException,  SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -130,20 +127,18 @@ public class ImplUsuarioDAO implements IUsuarioDAO{
                 throw new DAOException("Não foi possível o encontrar Usuario! Cod = " + nomeUsuario);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o Usuario.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrar o Usuario! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public Usuario permiteAcesso(String nomeUser, String senha) throws DAOException {
+    public Usuario permiteAcesso(String nomeUser, String senha) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -181,12 +176,14 @@ public class ImplUsuarioDAO implements IUsuarioDAO{
             }else{
                 return null;
             }
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao tentar conectar no banco.");
-            ex.printStackTrace();
-            System.out.println(ex.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 }

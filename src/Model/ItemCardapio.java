@@ -14,14 +14,12 @@ public class ItemCardapio {
     private Alimento alimento;
     private int qtdProduzida;
     private int numeroAlimento;
-    private String refeicao;
 
-    public ItemCardapio(Cardapio cardapio, Alimento alimento, int qtdProduzida, int numeroAlimento, String refeicao) {
+    public ItemCardapio(Cardapio cardapio, Alimento alimento, int qtdProduzida, int numeroAlimento) {
         this.cardapio = cardapio;
         this.alimento = alimento;
         this.qtdProduzida = qtdProduzida;
         this.numeroAlimento = numeroAlimento;
-        this.refeicao = refeicao;
     }
 
     public Cardapio getCardapio() {
@@ -56,14 +54,6 @@ public class ItemCardapio {
         this.numeroAlimento = numeroAlimento;
     }
 
-    public String getRefeicao() {
-        return refeicao;
-    }
-
-    public void setRefeicao(String refeicao) {
-        this.refeicao = refeicao;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if(o instanceof ItemCardapio) {

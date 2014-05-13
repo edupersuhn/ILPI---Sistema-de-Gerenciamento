@@ -5,7 +5,7 @@
 package Control.Impl;
 
 import Control.Impl.Exception.DAOException;
-import Control.Interface.IItemCardapioDAO;
+import Control.Interface.IDAO;
 import Model.Alimento;
 import Model.Cardapio;
 import Model.ItemCardapio;
@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author Bruno
  */
-public class ImplItemCardapioDAO implements IItemCardapioDAO{
+public class ImplItemCardapioDAO implements IDAO<ItemCardapio> {
 
     private static ImplItemCardapioDAO instance;
     
@@ -36,7 +36,7 @@ public class ImplItemCardapioDAO implements IItemCardapioDAO{
     }
     
     @Override
-    public void inserir(ItemCardapio item) throws DAOException {
+    public void inserir(ItemCardapio item) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -55,17 +55,21 @@ public class ImplItemCardapioDAO implements IItemCardapioDAO{
             prepared.setInt(3, item.getQtdProduzida());
             prepared.setInt(4, item.getNumeroAlimento());
 
-            result = prepared.executeQuery();
+            prepared.execute();
             
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao inserir alimento.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void atualizar(ItemCardapio item) throws DAOException {
+    public void atualizar(ItemCardapio item) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -97,16 +101,22 @@ public class ImplItemCardapioDAO implements IItemCardapioDAO{
                 prepared.setInt(3, item.getQtdProduzida());
                 prepared.setInt(4, item.getNumeroAlimento());
                 prepared.setInt(5, item.getCardapio().getCodigo());
+                
+                prepared.execute();
             }
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao atualizar alimento.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void remover(ItemCardapio item) throws DAOException {
+    public void remover(ItemCardapio item) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -130,28 +140,27 @@ public class ImplItemCardapioDAO implements IItemCardapioDAO{
                 prepared = con.prepareStatement(sql);
                 prepared.setInt(1, item.getCardapio().getCodigo());
                 prepared.setInt(1, item.getNumeroAlimento());
-                result = prepared.executeQuery();
+                prepared.execute();
             }else{
                 throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + item.getCardapio().getCodigo() + " " + item.getNumeroAlimento());
             }
                 
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir alimento! ");
-            System.out.println(dao.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public List<ItemCardapio> encontrarTodos() throws DAOException {
+    public List<ItemCardapio> encontrarTodos() throws DAOException, SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public ItemCardapio encontrarPorCodigo(int codCardapio,int numAlimento) throws DAOException {
+    public ItemCardapio encontrarPorCodigo(int codCardapio,int numAlimento) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         PreparedStatement prepared;
         ResultSet result;
@@ -185,16 +194,14 @@ public class ImplItemCardapioDAO implements IItemCardapioDAO{
                 throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codCardapio + " " + numAlimento);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrar o alimento! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
-    
 }

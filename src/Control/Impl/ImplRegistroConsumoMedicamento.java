@@ -5,7 +5,7 @@
 package Control.Impl;
 
 import Control.Impl.Exception.DAOException;
-import Control.Interface.IRegistroConsumoMedicamentoDAO;
+import Control.Interface.IDAO;
 import Model.RegistroConsumoMedicamento;
 import Util.ConectionManager;
 import java.sql.Connection;
@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Bruno
  */
-public class ImplRegistroConsumoMedicamento implements IRegistroConsumoMedicamentoDAO{
+public class ImplRegistroConsumoMedicamento implements IDAO<RegistroConsumoMedicamento> {
 
     private static ImplRegistroConsumoMedicamento instance;
     
@@ -34,11 +34,10 @@ public class ImplRegistroConsumoMedicamento implements IRegistroConsumoMedicamen
     }
     
     @Override
-    public void inserir(RegistroConsumoMedicamento reg) throws DAOException {
+    public void inserir(RegistroConsumoMedicamento reg) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
-        ResultSet result;
         try {
             //TODO Fazer o insert do idoso aqui
             prepared = con.prepareStatement("insert into registro_consumo_medicamento ("
@@ -55,17 +54,21 @@ public class ImplRegistroConsumoMedicamento implements IRegistroConsumoMedicamen
             prepared.setInt(4, reg.getHoraUtilizacao());
             prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
 
-            result = prepared.executeQuery();
+            prepared.execute();
             
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao inserir registro de consumo de medicamento.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void atualizar(RegistroConsumoMedicamento reg) throws DAOException {
+    public void atualizar(RegistroConsumoMedicamento reg) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -101,17 +104,22 @@ public class ImplRegistroConsumoMedicamento implements IRegistroConsumoMedicamen
                 prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
                 prepared.setInt(6, reg.getItem().getPrescricao().getCodigoPrescricao());
                 prepared.setInt(7, reg.getItem().getNumeroRemedio());
-                result = prepared.executeQuery();
+                
+                prepared.execute();
             }
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao atualizar cardapio.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void remover(RegistroConsumoMedicamento reg) throws DAOException {
+    public void remover(RegistroConsumoMedicamento reg) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -135,30 +143,30 @@ public class ImplRegistroConsumoMedicamento implements IRegistroConsumoMedicamen
                 prepared = con.prepareStatement(sql);
                 prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
                 prepared.setInt(2, reg.getItem().getNumeroRemedio());
-                result = prepared.executeQuery();
+                
+                prepared.execute();
             }else{
                 throw new DAOException("Não foi possível encontrar o cardapio informado! Cod: " 
                         + reg.getItem().getPrescricao().getCodigoPrescricao() + " - " 
                         + reg.getItem().getNumeroRemedio());
             }
                 
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o cardapio.");
-            System.out.println(ex.getMessage());
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir cardapio! ");
-            System.out.println(dao.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public List<RegistroConsumoMedicamento> encontrarTodos() throws DAOException {
+    public List<RegistroConsumoMedicamento> encontrarTodos() throws DAOException, SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public RegistroConsumoMedicamento encontrarPorCodigo(int codigo) throws DAOException {
+    public RegistroConsumoMedicamento encontrarPorCodigo(int codigo) throws DAOException, SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

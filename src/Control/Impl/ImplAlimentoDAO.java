@@ -34,7 +34,7 @@ public class ImplAlimentoDAO implements IDAO<Alimento> {
     }
     
     @Override
-    public void inserir(Alimento ali) throws DAOException {
+    public void inserir(Alimento ali) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -53,17 +53,20 @@ public class ImplAlimentoDAO implements IDAO<Alimento> {
             prepared.setString(3, ali.getNomeAlimento());
             prepared.setInt(4, ali.getQtdEstoque());
 
-            result = prepared.executeQuery();
+            prepared.execute();
             
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao inserir alimento.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao tentar excluir Evento! ");
+                System.out.println(ex1.getMessage());
+            }
         }
     }
 
     @Override
-    public void atualizar(Alimento ali) throws DAOException {
+    public void atualizar(Alimento ali) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -100,17 +103,22 @@ public class ImplAlimentoDAO implements IDAO<Alimento> {
                 prepared.setString(2, ali.getNomeAlimento());
                 prepared.setInt(3, ali.getQtdEstoque());
                 prepared.setInt(4, ali.getCodigo());
+                
+                prepared.execute();
             }
                 
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao atualizar alimento.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao tentar excluir Evento! ");
+                System.out.println(ex1.getMessage());
+            }
         }
     }
 
     @Override
-    public void remover(Alimento ali) throws DAOException {
+    public void remover(Alimento ali) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -135,19 +143,19 @@ public class ImplAlimentoDAO implements IDAO<Alimento> {
                 throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + ali.getCodigo());
             }
                 
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir alimento! ");
-            System.out.println(dao.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao tentar excluir Evento! ");
+                System.out.println(ex1.getMessage());
+            }
         }
     }
 
-    public List<Alimento> encontrarTodos() throws DAOException {
+    public List<Alimento> encontrarTodos() throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
-        List<Alimento> lista = new ArrayList<Alimento>();
+        List<Alimento> lista = new ArrayList<>();
         PreparedStatement prepared;
         ResultSet result;
         try {
@@ -167,24 +175,22 @@ public class ImplAlimentoDAO implements IDAO<Alimento> {
                 a = new Alimento(codigo, infNutricional, nomAlimento,qtdEstoq, "" /*refeicao*/);
                 lista.add(a);
             }
-            if(lista.size() == 0){
+            if(lista.isEmpty()){
                 throw new DAOException("Não foi possível encontrar alimentos");
             }
             Collections.sort(lista);
             return lista;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir alimento! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao tentar excluir Evento! ");
+                System.out.println(ex1.getMessage());
+            }
         }
     }
 
-    public Alimento encontrarPorCodigo(int codigo) throws DAOException {
+    public Alimento encontrarPorCodigo(int codigo) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -213,19 +219,17 @@ public class ImplAlimentoDAO implements IDAO<Alimento> {
                 throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codigo);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrar o alimento! ");
-            System.out.println(dao.getMessage());
-            return null;
+        }finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao tentar excluir Evento! ");
+                System.out.println(ex1.getMessage());
+            }
         }
     }
 
-    public Alimento encontrarPorNome(String nome) throws DAOException {
+    public Alimento encontrarPorNome(String nome) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -254,16 +258,13 @@ public class ImplAlimentoDAO implements IDAO<Alimento> {
                 throw new DAOException("Não foi possível o encontrar alimento! Nom = " + nome);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrar o alimento! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao tentar excluir Evento! ");
+                System.out.println(ex1.getMessage());
+            }
         }
     }
-    
 }
