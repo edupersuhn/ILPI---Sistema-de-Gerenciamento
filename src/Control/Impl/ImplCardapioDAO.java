@@ -45,13 +45,13 @@ public class ImplCardapioDAO implements IDAO<Cardapio> {
             //TODO Fazer o insert do idoso aqui
             prepared = con.prepareStatement("insert into cardapio ("
                     + "COD_CARDAPIO,"
-                    + "COD_IDOSO,"
+                    + "NUM_INDICE,"
                     + "DAT_CRIACAO,"
                     + "DAT_FIM) "
                     + "values (?,?,?,?)");
             
             prepared.setInt(1, card.getCodigo());
-            prepared.setInt(2,card.getIdoso().getCodIdoso());
+            prepared.setInt(2, card.getIndice());
             prepared.setDate(3, card.getDataCriacao());
             prepared.setDate(4, card.getDataFim());
 
@@ -89,13 +89,13 @@ public class ImplCardapioDAO implements IDAO<Cardapio> {
             }else{
                 sql =  "update cardapio "
                         + "set COD_CARDAPIO = ?,"
-                            + "COD_IDOSO = ?,"
+                            + "NUM_INDICE = ?,"
                             + "DAT_CRIACAO = ?,"
                             + "DAT_FIM = ? "
                       + "where COD_CARDAPIO = ?";
                 prepared = con.prepareStatement(sql);
                 prepared.setInt(1, card.getCodigo());
-                prepared.setInt(2, card.getIdoso().getCodIdoso());
+                prepared.setInt(2, card.getIndice());
                 prepared.setDate(3, card.getDataCriacao());
                 prepared.setDate(4, card.getDataFim());
                 prepared.setInt(5, card.getCodigo());
@@ -133,6 +133,7 @@ public class ImplCardapioDAO implements IDAO<Cardapio> {
                      + "where COD_CARDAPIO = ?";
                 prepared = con.prepareStatement(sql);
                 prepared.setInt(1, card.getCodigo());
+                
                 prepared.execute();
             }else{
                 throw new DAOException("Não foi possível encontrar o cardapio informado! Cod: " + card.getCodigo());
@@ -203,17 +204,55 @@ public class ImplCardapioDAO implements IDAO<Cardapio> {
             Cardapio a = null;
             while(result.next()){
                 int codigoCardapio = result.getInt("COD_CARDAPIO");
-                int codIdoso = result.getInt("COD_IDOSO");
+                int numIndice = result.getInt("NUM_INDICE");
                 Date datCriacao = result.getDate("DAT_CRIACAO");
                 Date datFim = result.getDate("DAT_FIM");
                 
-                Idoso idoso = ImplIdosoDAO.getInstance().encontrarPorCodigo(codIdoso);
-                
-                a = new Cardapio(idoso, codigoCardapio, datCriacao,datFim);
+                a = new Cardapio(codigoCardapio,numIndice, datCriacao,datFim);
             }
             
             if(a == null){
                 throw new DAOException("Não foi possível o encontrar Cardapio! Cod = " + codigo);
+            }
+            return a;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
+        }
+    }
+    
+    public Cardapio encontraPorIndice(int indice) throws SQLException, DAOException{
+        Connection con = ConectionManager.getInstance().getConexao();
+        
+        PreparedStatement prepared;
+        ResultSet result;
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from cardapio "
+                        + "where NUM_INDICE = ?";
+            prepared = con.prepareStatement(sql);
+            
+            prepared.setInt(1, indice);
+            
+            result = prepared.executeQuery();
+            
+            Cardapio a = null;
+            while(result.next()){
+                int codigoCardapio = result.getInt("COD_CARDAPIO");
+                int numIndice = result.getInt("NUM_INDICE");
+                Date datCriacao = result.getDate("DAT_CRIACAO");
+                Date datFim = result.getDate("DAT_FIM");
+                
+                a = new Cardapio(codigoCardapio,numIndice, datCriacao,datFim);
+            }
+            
+            if(a == null){
+                throw new DAOException("Não foi possível o encontrar Cardapio! Cod = " + indice);
             }
             return a;
         } finally {
