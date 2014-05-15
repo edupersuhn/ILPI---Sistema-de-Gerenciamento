@@ -5,13 +5,10 @@
 package Control.Impl;
 
 import Control.Impl.Exception.DAOException;
-import Control.Interface.IFuncionarioDAO;
-import Model.Cardapio;
+import Control.Interface.IDAO;
 import Model.Funcionario;
-import Model.Idoso;
 import Util.ConectionManager;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,7 +18,7 @@ import java.util.List;
  *
  * @author Bruno
  */
-public class ImplFuncionarioDAO implements IFuncionarioDAO{
+public class ImplFuncionarioDAO implements IDAO<Funcionario> {
 
     private static ImplFuncionarioDAO instance;
     
@@ -37,11 +34,11 @@ public class ImplFuncionarioDAO implements IFuncionarioDAO{
     }
     
     @Override
-    public void inserir(Funcionario func) throws DAOException {
+    public void inserir(Funcionario func) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
-        ResultSet result;
+        
         try {
             //TODO Fazer o insert do idoso aqui
             prepared = con.prepareStatement("insert into Funcionario ("
@@ -58,17 +55,21 @@ public class ImplFuncionarioDAO implements IFuncionarioDAO{
             prepared.setString(4, func.getEndereco());
             prepared.setLong(5, func.getTelefone());
 
-            result = prepared.executeQuery();
+            prepared.execute();
             
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao inserir funcionario.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void atualizar(Funcionario func) throws DAOException {
+    public void atualizar(Funcionario func) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -102,17 +103,21 @@ public class ImplFuncionarioDAO implements IFuncionarioDAO{
                 prepared.setLong(5, func.getTelefone());
                 prepared.setInt(6, func.getCodFuncionario());
                 
-                result = prepared.executeQuery();
+                prepared.execute();
             }
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao atualizar alimento.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void remover(Funcionario func) throws DAOException {
+    public void remover(Funcionario func) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -132,28 +137,27 @@ public class ImplFuncionarioDAO implements IFuncionarioDAO{
                      + "where COD_FUNCIONARIO = ?";
                 prepared = con.prepareStatement(sql);
                 prepared.setInt(1, func.getCodFuncionario());
-                result = prepared.executeQuery();
+                prepared.execute();
             }else{
                 throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + func.getCodFuncionario());
             }
                 
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir alimento! ");
-            System.out.println(dao.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public List<Funcionario> encontrarTodos() throws DAOException {
+    public List<Funcionario> encontrarTodos() throws DAOException, SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public Funcionario encontrarPorCodigo(int codigo) throws DAOException {
+    public Funcionario encontrarPorCodigo(int codigo) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -183,16 +187,14 @@ public class ImplFuncionarioDAO implements IFuncionarioDAO{
                 throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codigo);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrar o alimento! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
-    
 }

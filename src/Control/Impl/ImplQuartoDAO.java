@@ -5,14 +5,10 @@
 package Control.Impl;
 
 import Control.Impl.Exception.DAOException;
-import Control.Interface.IQuartoDAO;
-import Model.Alimento;
-import Model.Cardapio;
-import Model.Idoso;
+import Control.Interface.IDAO;
 import Model.Quarto;
 import Util.ConectionManager;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +20,7 @@ import java.util.List;
  *
  * @author Bruno
  */
-public class ImplQuartoDAO implements IQuartoDAO{
+public class ImplQuartoDAO implements IDAO<Quarto> {
 
     private static ImplQuartoDAO instance;
     
@@ -40,11 +36,10 @@ public class ImplQuartoDAO implements IQuartoDAO{
     }
     
     @Override
-    public void inserir(Quarto quarto) throws DAOException {
+    public void inserir(Quarto quarto) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
-        ResultSet result;
         try {
             //TODO Fazer o insert do idoso aqui
             prepared = con.prepareStatement("insert into quarto ("
@@ -59,17 +54,21 @@ public class ImplQuartoDAO implements IQuartoDAO{
             prepared.setInt(3, quarto.getCapacidade());
             prepared.setString(4, quarto.getEstado());
 
-            result = prepared.executeQuery();
+            prepared.execute();
             
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao inserir quarto.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void atualizar(Quarto quarto) throws DAOException {
+    public void atualizar(Quarto quarto) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -105,17 +104,21 @@ public class ImplQuartoDAO implements IQuartoDAO{
                 prepared.setInt(5, quarto.getNumQuarto());
                 prepared.setInt(6, quarto.getNumAndar());
                 
-                result = prepared.executeQuery();
+                prepared.execute();
             }
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao atualizar quarto.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void remover(Quarto quarto) throws DAOException {
+    public void remover(Quarto quarto) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -139,25 +142,25 @@ public class ImplQuartoDAO implements IQuartoDAO{
                 prepared = con.prepareStatement(sql);
                 prepared.setInt(1, quarto.getNumQuarto());
                 prepared.setInt(2, quarto.getNumAndar());
-                result = prepared.executeQuery();
+                prepared.execute();
             }else{
                 throw new DAOException("Não foi possível encontrar o quarto informado! Cod: " + quarto.getNumQuarto() + " " + quarto.getNumAndar());
             }
                 
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao remover o quarto.");
-            System.out.println(ex.getMessage());
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar remover quarto! ");
-            System.out.println(dao.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public List<Quarto> encontrarTodos() throws DAOException {
+    public List<Quarto> encontrarTodos() throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
-        List<Quarto> lista = new ArrayList<Quarto>();
+        List<Quarto> lista = new ArrayList<>();
         PreparedStatement prepared;
         ResultSet result;
         try {
@@ -176,25 +179,23 @@ public class ImplQuartoDAO implements IQuartoDAO{
                 q = new Quarto(num, andar, capacidade, estado);
                 lista.add(q);
             }
-            if(lista.size() == 0){
+            if(lista.isEmpty()){
                 throw new DAOException("Não foi possível encontrar alimentos");
             }
             Collections.sort(lista);
             return lista;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir alimento! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public Quarto encontrarPorCodigo(int numero, int andar) throws DAOException {
+    public Quarto encontrarPorCodigo(int numero, int andar) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -226,20 +227,18 @@ public class ImplQuartoDAO implements IQuartoDAO{
                 throw new DAOException("Não foi possível o encontrar encontrarPorCodigo! Cod = " + numero + " - " + andar);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao encontrarPorCodigo o quarto.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrarPorCodigo o quarto! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public List<Quarto> encontrarQuartosAndar(int andar) throws DAOException {
+    public List<Quarto> encontrarQuartosAndar(int andar) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         List<Quarto> lista = new ArrayList<>();
         PreparedStatement prepared;
@@ -270,16 +269,14 @@ public class ImplQuartoDAO implements IQuartoDAO{
                 throw new DAOException("Não foi possível o encontrar Quarto! Cod = " + andar);
             }
             return lista;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao encontrarQuartosAndar o quarto.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrarQuartosAndar o quarto! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
-    
 }

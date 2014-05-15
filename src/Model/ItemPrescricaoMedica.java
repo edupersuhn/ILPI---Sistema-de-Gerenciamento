@@ -15,25 +15,22 @@ public class ItemPrescricaoMedica {
     private PrescricaoMedica prescricao;
     private int numeroRemedio;
     private Remedio remedio;
-    private String hora;
     private String observacaoRemedio;
     private int qtdRemedio;
 
     public ItemPrescricaoMedica() {
-        this(null, 0, null, null, null, 0);
+        this(null, 0, null, null, 0);
     }
     
     public ItemPrescricaoMedica(PrescricaoMedica prescricao, 
                                 int numeroRemedio, 
                                 Remedio remedio, 
-                                String hora,
                                 String observacaoRemedio, 
                                 int qtdRemedio)
     {
         this.prescricao = prescricao;
         this.numeroRemedio = numeroRemedio;
         this.remedio = remedio;
-        this.hora = hora;
         this.observacaoRemedio = observacaoRemedio;
         this.qtdRemedio = qtdRemedio;
     }
@@ -78,14 +75,6 @@ public class ItemPrescricaoMedica {
         this.qtdRemedio = qtdRemedio;
     }
 
-    public String getHora() {
-        return hora;
-    }
-
-    public void setHora(String hora) {
-        this.hora = hora;
-    }
-
     public int getCod() {
         return cod;
     }
@@ -110,7 +99,7 @@ public class ItemPrescricaoMedica {
     
     @Override
     public String toString() {
-        return "Remedio: " + remedio.getNomeRemedio() + " " + qtdRemedio + " " + remedio.getUnidadeMedida() + "\nHora: " + hora;
+        return "Remedio: " + remedio.getNomeRemedio() + " " + qtdRemedio + " " + remedio.getUnidadeMedida();
     }
     
 }

@@ -5,7 +5,7 @@
 package Control.Impl;
 
 import Control.Impl.Exception.DAOException;
-import Control.Interface.IRemedioDAO;
+import Control.Interface.IDAO;
 import Model.Remedio;
 import Util.ConectionManager;
 import java.sql.Connection;
@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author Bruno
  */
-public class ImplRemedioDAO implements IRemedioDAO{
+public class ImplRemedioDAO implements IDAO<Remedio> {
 
     private static ImplRemedioDAO instance;
     
@@ -36,11 +36,10 @@ public class ImplRemedioDAO implements IRemedioDAO{
     }
     
     @Override
-    public void inserir(Remedio rem) throws DAOException {
+    public void inserir(Remedio rem) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
-        ResultSet result;
         try {
             //TODO Fazer o insert do idoso aqui
             prepared = con.prepareStatement("insert into remedio ("
@@ -55,17 +54,21 @@ public class ImplRemedioDAO implements IRemedioDAO{
             prepared.setInt(3, rem.getQtdEstoque());
             prepared.setString(4, rem.getUnidadeMedida());
 
-            result = prepared.executeQuery();
+            prepared.execute();
             
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao inserir cardapio.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void atualizar(Remedio rem) throws DAOException {
+    public void atualizar(Remedio rem) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -96,17 +99,21 @@ public class ImplRemedioDAO implements IRemedioDAO{
                 prepared.setString(4, rem.getUnidadeMedida());
                 prepared.setInt(5, rem.getCodigo());
                 
-                result = prepared.executeQuery();
+                prepared.execute();
             }
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao atualizar cardapio.");
-            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void remover(Remedio rem) throws DAOException {
+    public void remover(Remedio rem) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -126,25 +133,26 @@ public class ImplRemedioDAO implements IRemedioDAO{
                      + "where COD_REMEDIO = ?";
                 prepared = con.prepareStatement(sql);
                 prepared.setInt(1, rem.getCodigo());
-                result = prepared.executeQuery();
+                
+                prepared.execute();
             }else{
                 throw new DAOException("Não foi possível encontrar o cardapio informado! Cod: " + rem.getCodigo());
             }
                 
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o cardapio.");
-            System.out.println(ex.getMessage());
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir cardapio! ");
-            System.out.println(dao.getMessage());
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public List<Remedio> encontrarTodos() throws DAOException {
+    public List<Remedio> encontrarTodos() throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
-        List<Remedio> lista = new ArrayList<Remedio>();
+        List<Remedio> lista = new ArrayList<>();
         PreparedStatement prepared;
         ResultSet result;
         try {
@@ -163,25 +171,23 @@ public class ImplRemedioDAO implements IRemedioDAO{
                 r = new Remedio(codigo, nomRemedio, qtdEstoq, uniMedida);
                 lista.add(r);
             }
-            if(lista.size() == 0){
+            if(lista.isEmpty()){
                 throw new DAOException("Não foi possível encontrar alimentos");
             }
             Collections.sort(lista);
             return lista;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o alimento.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar excluir alimento! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    @Override
-    public Remedio encontrarPorCodigo(int codigo) throws DAOException {
+    public Remedio encontrarPorCodigo(int codigo) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
@@ -209,21 +215,18 @@ public class ImplRemedioDAO implements IRemedioDAO{
                 throw new DAOException("Não foi possível o encontrar Cardapio! Cod = " + codigo);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o Cardapio.");
-            System.out.println(ex.getMessage());
-            return null;
-        } catch(DAOException dao){
-            System.out.println("Erro ao tentar encontrar o Cardapio! ");
-            System.out.println(dao.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
-    
-    @Override
-    public Remedio encontrarPorNome(String nome) throws DAOException {
+    public Remedio encontrarPorNome(String nome) throws DAOException, SQLException {
         Connection con = ConectionManager.getInstance().getConexao();
         
         System.out.println("Nome: " + nome);
@@ -249,12 +252,14 @@ public class ImplRemedioDAO implements IRemedioDAO{
                 a = new Remedio(codRemedio, nomRemedio, qtdEstoq, uniMedida);
             }
             return a;
-        } catch (SQLException ex) {
-            //Logger.getLogger(IdosoController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Erro ao excluir o Cardapio.");
-            System.out.println(ex.getMessage());
-            return null;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
-    
 }

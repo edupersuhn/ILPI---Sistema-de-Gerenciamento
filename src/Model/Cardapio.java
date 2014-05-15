@@ -13,28 +13,28 @@ import java.sql.Date;
  */
 public class Cardapio {
     
-    private Idoso idoso;
+    private int indice;
     private int codigo;
     private Date dataCriacao;
     private Date dataFim;
 
     public Cardapio() {
-        this(null, 0, null, null);
+        this(0, 0, null, null);
     }
     
-    public Cardapio(Idoso idoso, int codigo, Date dataCriacao, Date dataFim) {
-        this.idoso = idoso;
+    public Cardapio(int codigo,int indice, Date dataCriacao, Date dataFim) {
+        this.indice = indice;
         this.codigo = codigo;
         this.dataCriacao = dataCriacao;
         this.dataFim = dataFim;
     }
 
-    public Idoso getIdoso() {
-        return idoso;
+    public int getIndice() {
+        return indice;
     }
 
-    public void setIdoso(Idoso idoso) {
-        this.idoso = idoso;
+    public void setIndice(int indice) {
+        this.indice = indice;
     }
 
     public int getCodigo() {

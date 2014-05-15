@@ -79,8 +79,8 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
         return comboBoxIdoso.getSelectedIndex() == 0 ||
                listaItensAlmoco.isEmpty() ||
                listaItensCafe.isEmpty() ||
-               listaItensJantar.isEmpty() ||
-               campoCodigo.getText().equals("");
+               listaItensJantar.isEmpty(); //||
+//               campoCodigo.getText().equals("");
     }
     
     private String cardapioToString() {
@@ -114,7 +114,7 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
     }
     
     private void limpar() {
-        campoCodigo.setText("");
+        //campoCodigo.setText("");
         campoQuantidade.setText("");
         comboBoxIdoso.setSelectedIndex(0);
         comboBoxAlimento.setSelectedIndex(0);
