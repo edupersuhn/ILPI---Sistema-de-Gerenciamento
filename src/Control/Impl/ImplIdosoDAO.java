@@ -104,7 +104,7 @@ public class ImplIdosoDAO implements IDAO<Idoso> {
             }else{
                 sql =  "update idoso "
                         + "set COD_IDOSO = ?,"
-                            + "NOME = ?,"
+                            + "NOM_IDOSO = ?,"
                             + "DAT_NASCIMENTO = ?,"
                             + "LOCAL_ORIGEM = ? "
                             + "NUM_TELEFONE = ?,"
@@ -274,11 +274,11 @@ public class ImplIdosoDAO implements IDAO<Idoso> {
             Idoso a = null;
             while(result.next()){
                 int codIdoso = result.getInt("COD_IDOSO");
-                String nome = result.getString("NOME");
+                String nome = result.getString("NOM_IDOSO");
                 Date data = result.getDate("DAT_NASCIMENTO");
                 String local = result.getString("LOCAL_ORIGEM");
-                String fone = result.getString("NUM_TELEFONE_PARENT");
-                String end = result.getString("DSC_ENDERECO_PARENT");
+                String fone = result.getString("NUM_TEL_PARENT");
+                String end = result.getString("DSC_END_PARENT");
                 String cuidados = result.getString("DSC_CUIDADOS_ESP");
                 boolean acamado = result.getBoolean("ACAMADO");
                 String cpf = result.getString("NUM_CPF");

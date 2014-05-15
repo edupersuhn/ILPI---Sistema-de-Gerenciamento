@@ -7,6 +7,8 @@
 package View;
 
 import Control.LoginController;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -23,6 +25,9 @@ public class FrameCuidador extends javax.swing.JFrame {
         initComponents();
         interfaceILPI = interILPI;
         this.setLocationRelativeTo(null);
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+        labelDataAtual.setText(format.format(date));
     }
 
     @Override
