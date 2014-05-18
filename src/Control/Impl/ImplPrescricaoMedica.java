@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -152,7 +153,46 @@ public class ImplPrescricaoMedica implements IDAO<PrescricaoMedica> {
             }
         }
     }
+    
+    public List<PrescricaoMedica> encontrarTodos() throws DAOException, SQLException {
+        
+        
+        Connection con = ConectionManager.getInstance().getConexao();
 
+        PreparedStatement prepared;
+        ResultSet result;
+        List<PrescricaoMedica> lista = new ArrayList<>();
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from prescricao_medica";
+            prepared = con.prepareStatement(sql);
+
+            result = prepared.executeQuery();
+
+            PrescricaoMedica a = null;
+            while (result.next()) {
+                int codPrescricao = result.getInt("COD_PRESCRICAO");
+                int codIdoso = result.getInt("COD_IDOSO");
+                String dscObservacao = result.getString("DSC_OBSERVACAO");
+                Date datPrescricao = result.getDate("DAT_PRESCRICAO");
+                int horaPrescricao = result.getInt("HORA_PRESCRICAO");
+                Idoso idoso = ImplIdosoDAO.getInstance().encontrarPorCodigo(codIdoso);
+
+                a = new PrescricaoMedica(idoso, codPrescricao, dscObservacao, datPrescricao, horaPrescricao);
+                lista.add(a);
+            }
+            return lista;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
+        }
+    }
+    
     public List<ItemPrescricaoMedica> encontrarTodos(int codigo) throws DAOException, SQLException {
         return ImplItemPrescricaoMedica.getInstance().encontrarTodos(codigo);
     }
