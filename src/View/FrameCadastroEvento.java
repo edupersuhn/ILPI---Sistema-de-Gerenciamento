@@ -6,67 +6,17 @@
 
 package View;
 
-import Control.Impl.ImplEventoDAO;
-import Model.Evento;
-import Model.Idoso;
-import Util.ComponentValidator;
-import Util.DataConverter;
-import Util.Mensagens;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  *
  * @author Eduardo
  */
 public class FrameCadastroEvento extends javax.swing.JFrame {
 
-    private ArrayList<Idoso> idosos;
-    
-    private ArrayList<Idoso> idososEdicao;
-    
     /**
      * Creates new form FrameCadastroEvento
      */
     public FrameCadastroEvento() {
         initComponents();
-        idosos = new ArrayList<>();
-        idososEdicao = new ArrayList<>();
-    }
-    
-    private void limparCadastro() {
-        campoNome.setText("");
-        campoData.setText("");
-        comboBoxIdoso.setSelectedIndex(0);
-        listIdosos.removeAll();
-    }
-    
-    private void limparEdicao() {
-        comboBoxEvento.setSelectedIndex(0);
-        campoNomeEdicao.setText("");
-        campoDataEdicao.setText("");
-        comboBoxIdosoEdicao.setSelectedIndex(0);
-        listIdososEdicao.removeAll();
-        habilitado(false);
-    }
-    
-    private void habilitado(boolean flag) {
-        campoNomeEdicao.setEnabled(flag);
-        campoDataEdicao.setEnabled(flag);
-        comboBoxIdosoEdicao.setEnabled(flag);
-        listIdososEdicao.setEnabled(flag);
-        botaoAdicionarEdicao.setEnabled(flag);
-        botaoRemoverEdicao.setEnabled(flag);
-        botaoSalvar.setEnabled(flag);
-    }
-    
-    private void atualizaListaIdosos() {
-        listIdosos.setListData(idosos.toArray());
-    }
-    
-    private void atualizaListaIdososEdicao() {
-        listIdososEdicao.setListData(idososEdicao.toArray());
     }
 
     /**
@@ -88,40 +38,28 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
         comboBoxIdoso = new javax.swing.JComboBox();
         botaoAdicionar = new javax.swing.JButton();
         botaoRemover = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        listIdosos = new javax.swing.JList();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        areaIdososParticipantes = new javax.swing.JTextArea();
         campoNome = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         comboBoxEvento = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        campoDataEdicao = new javax.swing.JFormattedTextField();
+        campoData1 = new javax.swing.JFormattedTextField();
         jPanel4 = new javax.swing.JPanel();
-        comboBoxIdosoEdicao = new javax.swing.JComboBox();
-        botaoAdicionarEdicao = new javax.swing.JButton();
-        botaoRemoverEdicao = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        listIdososEdicao = new javax.swing.JList();
+        comboBoxIdoso1 = new javax.swing.JComboBox();
+        botaoAdicionar1 = new javax.swing.JButton();
+        botaoRemover1 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        areaIdososParticipantesEdicao = new javax.swing.JTextArea();
         botaoSalvar = new javax.swing.JButton();
         campoNomeEdicao = new javax.swing.JTextField();
-        botaoConsultar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Cadastro de Evento");
         setResizable(false);
 
-        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jTabbedPane1StateChanged(evt);
-            }
-        });
-
         botaoCadastrar.setText("Cadastrar");
-        botaoCadastrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoCadastrarActionPerformed(evt);
-            }
-        });
 
         jLabel2.setText("Data:");
 
@@ -138,20 +76,14 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
         comboBoxIdoso.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione idoso" }));
 
         botaoAdicionar.setText("Adicionar");
-        botaoAdicionar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoAdicionarActionPerformed(evt);
-            }
-        });
 
         botaoRemover.setText("Remover");
-        botaoRemover.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoRemoverActionPerformed(evt);
-            }
-        });
 
-        jScrollPane1.setViewportView(listIdosos);
+        areaIdososParticipantes.setEditable(false);
+        areaIdososParticipantes.setColumns(5);
+        areaIdososParticipantes.setRows(5);
+        areaIdososParticipantes.setTabSize(5);
+        jScrollPane4.setViewportView(areaIdososParticipantes);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -165,8 +97,8 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(botaoAdicionar))
                     .addComponent(botaoRemover))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane4))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -177,8 +109,8 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
                     .addComponent(botaoAdicionar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(botaoRemover)
-                .addContainerGap(123, Short.MAX_VALUE))
-            .addComponent(jScrollPane1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -231,79 +163,60 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
         jLabel5.setText("Data:");
 
         try {
-            campoDataEdicao.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
+            campoData1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
-        campoDataEdicao.setEnabled(false);
+        campoData1.setEnabled(false);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Idosos Participantes"));
 
-        comboBoxIdosoEdicao.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione idoso" }));
-        comboBoxIdosoEdicao.setEnabled(false);
+        comboBoxIdoso1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione idoso" }));
+        comboBoxIdoso1.setEnabled(false);
 
-        botaoAdicionarEdicao.setText("Adicionar");
-        botaoAdicionarEdicao.setEnabled(false);
-        botaoAdicionarEdicao.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoAdicionarEdicaoActionPerformed(evt);
-            }
-        });
+        botaoAdicionar1.setText("Adicionar");
+        botaoAdicionar1.setEnabled(false);
 
-        botaoRemoverEdicao.setText("Remover");
-        botaoRemoverEdicao.setEnabled(false);
-        botaoRemoverEdicao.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoRemoverEdicaoActionPerformed(evt);
-            }
-        });
+        botaoRemover1.setText("Remover");
+        botaoRemover1.setEnabled(false);
 
-        listIdososEdicao.setEnabled(false);
-        jScrollPane2.setViewportView(listIdososEdicao);
+        areaIdososParticipantesEdicao.setColumns(5);
+        areaIdososParticipantesEdicao.setRows(5);
+        areaIdososParticipantesEdicao.setTabSize(5);
+        areaIdososParticipantesEdicao.setEnabled(false);
+        jScrollPane3.setViewportView(areaIdososParticipantesEdicao);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(botaoAdicionarEdicao)
-                    .addComponent(botaoRemoverEdicao))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(comboBoxIdosoEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botaoAdicionar1)
+                    .addComponent(botaoRemover1))
+                .addGap(18, 18, 18)
+                .addComponent(comboBoxIdoso1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(botaoAdicionarEdicao)
-                    .addComponent(comboBoxIdosoEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(botaoAdicionar1)
+                    .addComponent(comboBoxIdoso1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(botaoRemoverEdicao)
+                .addComponent(botaoRemover1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
         );
 
         botaoSalvar.setText("Salvar alterações");
         botaoSalvar.setEnabled(false);
-        botaoSalvar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoSalvarActionPerformed(evt);
-            }
-        });
 
         campoNomeEdicao.setEnabled(false);
-
-        botaoConsultar.setText("Consultar");
-        botaoConsultar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoConsultarActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -314,33 +227,28 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboBoxEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
                                     .addComponent(jLabel5))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(campoDataEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(campoNomeEdicao)))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(comboBoxEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(botaoConsultar)))
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(campoData1, javax.swing.GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
+                                    .addComponent(campoNomeEdicao))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(119, 119, 119)
                 .addComponent(botaoSalvar)
-                .addContainerGap(136, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboBoxEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botaoConsultar))
+                .addComponent(comboBoxEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -348,10 +256,10 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(campoDataEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(campoData1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, Short.MAX_VALUE)
+                .addGap(18, 24, Short.MAX_VALUE)
                 .addComponent(botaoSalvar)
                 .addContainerGap())
         );
@@ -372,159 +280,22 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void botaoAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAdicionarActionPerformed
-        if(comboBoxIdoso.getSelectedIndex() != 0) {
-            idosos.add((Idoso) comboBoxIdoso.getSelectedItem());
-            atualizaListaIdosos();
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Idoso");
-        }
-    }//GEN-LAST:event_botaoAdicionarActionPerformed
-
-    private void botaoRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoRemoverActionPerformed
-        if(comboBoxIdoso.getSelectedIndex() != 0) {
-            idosos.remove((Idoso) listIdosos.getSelectedValue());
-            atualizaListaIdosos();
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Idoso");
-        }
-    }//GEN-LAST:event_botaoRemoverActionPerformed
-
-    private void botaoCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastrarActionPerformed
-        Evento e = new Evento();
-        if(!campoNome.getText().equals("")) {
-            e.setNomeEvento(campoNome.getText());
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Nome");
-            return;
-        }
-        if(ComponentValidator.date(campoData)) {
-            e.setDataEvento(DataConverter.stringTypeToSQLDate(campoData.getText()));
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Data");
-            return;
-        }
-        if(!idosos.isEmpty()) {
-            e.setListaIdosos(idosos);
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Lista de Idosos");
-            return;
-        }
-        try {
-            ImplEventoDAO.getInstance().inserir(e, null);
-            limparCadastro();
-        } catch(Exception ex) {
-            ex.printStackTrace();
-        }
-    }//GEN-LAST:event_botaoCadastrarActionPerformed
-
-    private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
-        if(comboBoxEvento.getSelectedIndex() != 0) {
-            habilitado(true);
-            try {
-                Evento e = ImplEventoDAO.getInstance().encontrarPorCodigo(((Idoso) comboBoxIdosoEdicao.getSelectedItem()).getCodIdoso());
-                campoNome.setText(e.getNomeEvento());
-                campoData.setText(DataConverter.sqlDateTypeToString(e.getDataEvento()));
-                idososEdicao.addAll(e.getListaIdosos());
-                atualizaListaIdososEdicao();
-            } catch(Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Evento");
-        }
-    }//GEN-LAST:event_botaoConsultarActionPerformed
-
-    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-        if(jTabbedPane1.getSelectedIndex() == 1) {
-            try {
-                comboBoxEvento.removeAllItems();
-                List<Evento> lista = ImplEventoDAO.getInstance().encontrarTodos();
-                if(lista != null) {
-                    for (Iterator<Evento> it = lista.iterator(); it.hasNext();) {
-                        Evento evento = it.next();
-                        comboBoxEvento.addItem(evento);
-                    }
-                }
-            } catch(Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }//GEN-LAST:event_jTabbedPane1StateChanged
-
-    private void botaoRemoverEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoRemoverEdicaoActionPerformed
-        if(comboBoxIdosoEdicao.getSelectedIndex() != 0) {
-            idososEdicao.remove((Idoso) listIdososEdicao.getSelectedValue());
-            atualizaListaIdosos();
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Idoso");
-        }
-    }//GEN-LAST:event_botaoRemoverEdicaoActionPerformed
-
-    private void botaoAdicionarEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAdicionarEdicaoActionPerformed
-        if(comboBoxIdoso.getSelectedIndex() != 0) {
-            idosos.add((Idoso) comboBoxIdoso.getSelectedItem());
-            atualizaListaIdosos();
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Idoso");
-        }
-    }//GEN-LAST:event_botaoAdicionarEdicaoActionPerformed
-
-    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
-        Evento e = new Evento();
-        if(!campoNomeEdicao.getText().equals("")) {
-            e.setNomeEvento(campoNomeEdicao.getText());
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Nome");
-            return;
-        }
-        if(ComponentValidator.date(campoDataEdicao)) {
-            e.setDataEvento(DataConverter.stringTypeToSQLDate(campoDataEdicao.getText()));
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Data");
-            return;
-        }
-        if(!idososEdicao.isEmpty()) {
-            e.setListaIdosos(idososEdicao);
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Lista de Idosos");
-            return;
-        }
-        try {
-            ImplEventoDAO.getInstance().atualizar(e, null);
-            limparEdicao();
-            habilitado(false);
-        } catch(Exception ex) {
-            ex.printStackTrace();
-        }
-    }//GEN-LAST:event_botaoSalvarActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea areaIdososParticipantes;
+    private javax.swing.JTextArea areaIdososParticipantesEdicao;
     private javax.swing.JButton botaoAdicionar;
-    private javax.swing.JButton botaoAdicionarEdicao;
+    private javax.swing.JButton botaoAdicionar1;
     private javax.swing.JButton botaoCadastrar;
-    private javax.swing.JButton botaoConsultar;
     private javax.swing.JButton botaoRemover;
-    private javax.swing.JButton botaoRemoverEdicao;
+    private javax.swing.JButton botaoRemover1;
     private javax.swing.JButton botaoSalvar;
     private javax.swing.JFormattedTextField campoData;
-    private javax.swing.JFormattedTextField campoDataEdicao;
+    private javax.swing.JFormattedTextField campoData1;
     private javax.swing.JTextField campoNome;
     private javax.swing.JTextField campoNomeEdicao;
     private javax.swing.JComboBox comboBoxEvento;
     private javax.swing.JComboBox comboBoxIdoso;
-    private javax.swing.JComboBox comboBoxIdosoEdicao;
+    private javax.swing.JComboBox comboBoxIdoso1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -533,10 +304,8 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JList listIdosos;
-    private javax.swing.JList listIdososEdicao;
     // End of variables declaration//GEN-END:variables
 }

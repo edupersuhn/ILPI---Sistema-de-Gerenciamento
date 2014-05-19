@@ -41,33 +41,22 @@ public class ImplIncidenteDAO implements IDAO<Incidente> {
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            prepared = con.prepareStatement("insert into incidente ("
-                    + "COD_INCIDENTE,"
-                    + "COD_IDOSO,"
-                    + "COD_FUNCIONARIO,"
-                    + "DAT_OCORRENCIA,"
-                    + "DSC_INCIDENTE) "
-                    + "values (?,?,?,?,?)");
-            
-            prepared.setInt(1, inc.getCodigoIncidente());
-            prepared.setInt(2, inc.getIdoso().getCodIdoso());
-            prepared.setInt(3, inc.getFunc().getCodFuncionario());
-            prepared.setDate(4, inc.getDataIncidente());
-            prepared.setString(5, inc.getDescricaoIncidente());
+        //TODO Fazer o insert do idoso aqui
+        prepared = con.prepareStatement("insert into incidente ("
+                + "COD_INCIDENTE,"
+                + "COD_IDOSO,"
+                + "COD_FUNCIONARIO,"
+                + "DAT_OCORRENCIA,"
+                + "DSC_INCIDENTE) "
+                + "values (?,?,?,?,?)");
 
-            prepared.execute();
-            
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
-        }
+        prepared.setInt(1, inc.getCodigoIncidente());
+        prepared.setInt(2, inc.getIdoso().getCodIdoso());
+        prepared.setInt(3, inc.getFunc().getCodFuncionario());
+        prepared.setDate(4, inc.getDataIncidente());
+        prepared.setString(5, inc.getDescricaoIncidente());
+
+        prepared.execute();
     }
 
     @Override
@@ -76,46 +65,36 @@ public class ImplIncidenteDAO implements IDAO<Incidente> {
         
         PreparedStatement prepared;
         ResultSet result;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            String sql = "select * from incidente"
-                    + " where COD_INCIDENTE = ?";
+        //TODO Fazer o insert do idoso aqui
+        String sql = "select * from incidente"
+                + " where COD_INCIDENTE = ?";
+        prepared = con.prepareStatement(sql);
+
+        prepared.setInt(1, inc.getCodigoIncidente());
+
+        result = prepared.executeQuery();
+
+        if(!result.next()){
+            inserir(inc);
+        }else{
+            sql =  "update incidente "
+                    + "set COD_INCIDENTE = ?,"
+                        + "COD_IDOSO = ?,"
+                        + "COD_FUNCIONARIO = ?,"
+                        + "DAT_OCORRENCIA = ?,"
+                        + "DSC_INCIDENTE = ? "
+                  + "where COD_INCIDENTE = ?";
+
             prepared = con.prepareStatement(sql);
-            
+
             prepared.setInt(1, inc.getCodigoIncidente());
-            
-            result = prepared.executeQuery();
-            
-            if(!result.next()){
-                inserir(inc);
-            }else{
-                sql =  "update incidente "
-                        + "set COD_INCIDENTE = ?,"
-                            + "COD_IDOSO = ?,"
-                            + "COD_FUNCIONARIO = ?,"
-                            + "DAT_OCORRENCIA = ?,"
-                            + "DSC_INCIDENTE = ? "
-                      + "where COD_INCIDENTE = ?";
-                
-                prepared = con.prepareStatement(sql);
-                
-                prepared.setInt(1, inc.getCodigoIncidente());
-                prepared.setInt(2, inc.getIdoso().getCodIdoso());
-                prepared.setInt(3, inc.getFunc().getCodFuncionario());
-                prepared.setDate(4, inc.getDataIncidente());
-                prepared.setString(5, inc.getDescricaoIncidente());
-                prepared.setInt(6, inc.getCodigoIncidente());
-                
-                prepared.execute();
-            }
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
+            prepared.setInt(2, inc.getIdoso().getCodIdoso());
+            prepared.setInt(3, inc.getFunc().getCodFuncionario());
+            prepared.setDate(4, inc.getDataIncidente());
+            prepared.setString(5, inc.getDescricaoIncidente());
+            prepared.setInt(6, inc.getCodigoIncidente());
+
+            prepared.execute();
         }
     }
 
@@ -125,34 +104,23 @@ public class ImplIncidenteDAO implements IDAO<Incidente> {
         
         PreparedStatement prepared;
         ResultSet result;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            String sql = "select * from incidente"
-                    + " where COD_INCIDENTE = ?";
+        //TODO Fazer o insert do idoso aqui
+        String sql = "select * from incidente"
+                + " where COD_INCIDENTE = ?";
+        prepared = con.prepareStatement(sql);
+
+        prepared.setInt(1, inc.getCodigoIncidente());
+
+        result = prepared.executeQuery();
+
+        if(result.next()){
+            sql = "delete incidente "
+                 + "where COD_INCIDENTE = ?";
             prepared = con.prepareStatement(sql);
-            
             prepared.setInt(1, inc.getCodigoIncidente());
-            
-            result = prepared.executeQuery();
-            
-            if(result.next()){
-                sql = "delete incidente "
-                     + "where COD_INCIDENTE = ?";
-                prepared = con.prepareStatement(sql);
-                prepared.setInt(1, inc.getCodigoIncidente());
-                prepared.execute();
-            }else{
-                throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + inc.getCodigoIncidente());
-            }
-                
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
+            prepared.execute();
+        }else{
+            throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + inc.getCodigoIncidente());
         }
     }
 
@@ -165,43 +133,33 @@ public class ImplIncidenteDAO implements IDAO<Incidente> {
         
         PreparedStatement prepared;
         ResultSet result;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            String sql = "select * from incidente "
-                        + "where COD_INCIDENTE = ?";
-            prepared = con.prepareStatement(sql);
-            
-            prepared.setInt(1, codigo);
-            
-            result = prepared.executeQuery();
-            
-            Incidente a = null;
-            while(result.next()){
-                int codIncidente = result.getInt("COD_INCIDENTE");
-                int codIdoso = result.getInt("COD_IDOSO");
-                Idoso i = ImplIdosoDAO.getInstance().encontrarPorCodigo(codIdoso);
-                
-                int codFunc = result.getInt("COD_FUNCIONARIO");
-                Funcionario f = ImplFuncionarioDAO.getInstance().encontrarPorCodigo(codFunc);
-                
-                Date datOcorrencia = result.getDate("DAT_OCORRENCIA");
-                String dscIncidente = result.getString("DSC_INCIDENTE");
-                
-                a = new Incidente(codIncidente, f, i,datOcorrencia,dscIncidente);
-            }
-            
-            if(a == null){
-                throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codigo);
-            }
-            return a;
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
+        //TODO Fazer o insert do idoso aqui
+        String sql = "select * from incidente "
+                    + "where COD_INCIDENTE = ?";
+        prepared = con.prepareStatement(sql);
+
+        prepared.setInt(1, codigo);
+
+        result = prepared.executeQuery();
+
+        Incidente a = null;
+        while(result.next()){
+            int codIncidente = result.getInt("COD_INCIDENTE");
+            int codIdoso = result.getInt("COD_IDOSO");
+            Idoso i = ImplIdosoDAO.getInstance().encontrarPorCodigo(codIdoso);
+
+            int codFunc = result.getInt("COD_FUNCIONARIO");
+            Funcionario f = ImplFuncionarioDAO.getInstance().encontrarPorCodigo(codFunc);
+
+            Date datOcorrencia = result.getDate("DAT_OCORRENCIA");
+            String dscIncidente = result.getString("DSC_INCIDENTE");
+
+            a = new Incidente(codIncidente, f, i,datOcorrencia,dscIncidente);
         }
+
+        if(a == null){
+            throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codigo);
+        }
+        return a;
     }
 }
