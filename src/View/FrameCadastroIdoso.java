@@ -837,7 +837,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             ImplQuartoDAO.getInstance().atualizar(q);
             limparCadastro();
             Mensagens.cadastradoComSucesso(this);
-        } catch(DAOException ex) {
+        } catch(Exception ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
@@ -1001,7 +1001,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             quarto = q;
             limparEdicao();
             Mensagens.alteradoComSucesso(this);
-        } catch(DAOException ex) {
+        } catch(Exception ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoSalvarActionPerformed

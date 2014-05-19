@@ -76,9 +76,8 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
     
     private void limparCadastro() {
         areaObs.setText("");
+        listaItens.clear();
         listaPrescricao.removeAll();
-        botaoAdicionar.setText("");
-        botaoRemover.setText("");
         campoData.setText("");
         campoHora.setText("");
         campoID.setText("");
@@ -90,15 +89,18 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
     
     private void limparEdicao() {
         areaObsEdicao.setText("");
-        listaPrescricao.removeAll();
-        botaoAdicionarEdicao.setText("");
-        botaoRemoverEdicao.setText("");
+        listaPrescricaoEdicao.removeAll();
+        botaoAdicionarEdicao.setEnabled(false);
+        botaoRemoverEdicao.setEnabled(false);
         campoDataEdicao.setText("");
         campoHoraEdicao.setText("");
         campoIDEdicao.setText("");
         campoQuantidadeEdicao.setText("");
         comboBoxIdosoEdicao.setSelectedIndex(0);
         comboBoxRemedioEdicao.setSelectedIndex(0);
+        listaItensEdicao.clear();
+        adicionados.clear();
+        removidos.clear();
         habilitado(false);
     }
     
@@ -822,7 +824,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
                 ex.printStackTrace();
             }
             atualizaPrescricaoEdicao();
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+            SimpleDateFormat format = new SimpleDateFormat("DD//YYYY");
             campoDataEdicao.setText(format.format(prescricao.getDataPrescricao()));
             // campoIDEdicao.setText(prescricao.getID());
             comboBoxRemedioEdicao.setSelectedIndex(0);

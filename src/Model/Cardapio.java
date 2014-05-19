@@ -61,4 +61,8 @@ public class Cardapio {
         this.dataFim = dataFim;
     }
     
+    public String toString() {
+        return /*nome + */ codigo + "";
+    }
+    
 }

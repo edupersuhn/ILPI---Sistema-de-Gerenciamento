@@ -72,4 +72,8 @@ public class PrescricaoMedica {
         this.horaPrescricao = horaPrescricao;
     }
     
+    public String toString() {
+        return "Prescrição n°" + codigoPrescricao;
+    }
+    
 }

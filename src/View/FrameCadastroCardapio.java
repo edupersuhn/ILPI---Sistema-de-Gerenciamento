@@ -6,19 +6,25 @@
 
 package View;
 
-import Control.Impl.Exception.DAOException;
 import Control.Impl.ImplAlimentoDAO;
 import Control.Impl.ImplCardapioDAO;
-import Control.Impl.ImplIdosoDAO;
 import Control.Impl.ImplItemCardapioDAO;
+import Control.Impl.ImplItemPrescricaoMedica;
+import Control.Impl.ImplPrescricaoMedica;
 import Model.Alimento;
 import Model.Cardapio;
 import Model.Idoso;
 import Model.ItemCardapio;
+import Model.ItemPrescricaoMedica;
+import Model.PrescricaoMedica;
+import Model.Remedio;
+import Util.ComponentValidator;
+import Util.DataConverter;
+import Util.Mensagens;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -26,99 +32,72 @@ import javax.swing.JOptionPane;
  */
 public class FrameCadastroCardapio extends javax.swing.JFrame {
 
-    private List<Idoso> listaI;
-    private List<Alimento> listaA;
+    private List<ItemCardapio> listaItens;
+    private List<ItemCardapio> listaItensEdicao;
+    private List<ItemCardapio> removidos;
+    private List<ItemCardapio> adicionados;
     
-    private ArrayList<ItemCardapio> listaItensCafe;
-    private ArrayList<ItemCardapio> listaItensAlmoco;
-    private ArrayList<ItemCardapio> listaItensJantar;
     private Cardapio cardapio;
+    
+    private int cod = 0;
+    private int codEdicao = 0;
     
     /**
      * Creates new form CadastroPrescricao
      */
     public FrameCadastroCardapio() {
         initComponents();
-        listaItensCafe = new ArrayList<>();
-        listaItensAlmoco = new ArrayList<>();
-        listaItensJantar = new ArrayList<>();
-        cardapio = new Cardapio();
+        listaItens = new ArrayList<>();
+        listaItensEdicao = new ArrayList<>();
+        removidos = new ArrayList<>();
+        adicionados = new ArrayList<>();
         try {
-            listaI = ImplIdosoDAO.getInstance().encontrarTodosIdosos();
-            listaA = ImplAlimentoDAO.getInstance().encontrarTodos();
-            for (Iterator<Idoso> it = listaI.iterator(); it.hasNext();) {
-                Idoso idoso = it.next();
-                comboBoxIdoso.addItem(idoso);
+            List<Alimento> listaR = ImplAlimentoDAO.getInstance().encontrarTodos();
+            if(listaR != null) {
+                for (Iterator<Alimento> it = listaR.iterator(); it.hasNext();) {
+                    Alimento r = it.next();
+                    comboBoxAlimento.addItem(r);
+                    comboBoxAlimentoEdicao.addItem(r);
+                }
             }
-            for (Iterator<Alimento> it = listaA.iterator(); it.hasNext();) {
-                Alimento alimento = it.next();
-                comboBoxAlimento.addItem(alimento);
-            }
-        } catch(DAOException ex) {
-            System.out.println(ex.getMessage());
+        } catch(Exception ex) {
             ex.printStackTrace();
         }
+        
     }
 
-    private boolean campoAddVazio() {
-        return comboBoxAlimento.getSelectedIndex() == 0 ||
-               campoQuantidade.getText().equals("");
-    }
     
-    private String refeicaoSelecionada() {
-        if(radioButtonCafeManha.isSelected()) return "Café da manhã";
-        else if(radioButtonAlmoco.isSelected()) return "Almoço";
-        else return "Jantar";
-    }
-    
-    private boolean campoRemoverVazio() {
-        return comboBoxAlimento.getSelectedIndex() == 0;
-    }
-    
-    private boolean campoCadastrarVazio() {
-        return comboBoxIdoso.getSelectedIndex() == 0 ||
-               listaItensAlmoco.isEmpty() ||
-               listaItensCafe.isEmpty() ||
-               listaItensJantar.isEmpty(); //||
-//               campoCodigo.getText().equals("");
-    }
-    
-    private String cardapioToString() {
-        String s = new String();
-        if(!listaItensCafe.isEmpty()) {
-            s += "----------- Café da manhã -----------\n";
-        }
-        for (Iterator<ItemCardapio> it = listaItensCafe.iterator(); it.hasNext();) {
-            ItemCardapio itemCardapio = it.next();
-            s += itemCardapio + "\n";
-        }
-        if(!listaItensAlmoco.isEmpty()) {
-            s += "----------- Almoço -------------------\n";
-        }
-        for (Iterator<ItemCardapio> it = listaItensAlmoco.iterator(); it.hasNext();) {
-            ItemCardapio itemCardapio = it.next();
-            s += itemCardapio + "\n";
-        }
-        if(!listaItensJantar.isEmpty()) {
-            s += "----------- Jantar -------------------\n";
-        }
-        for (Iterator<ItemCardapio> it = listaItensJantar.iterator(); it.hasNext();) {
-            ItemCardapio itemCardapio = it.next();
-            s += itemCardapio + "\n";
-        }
-        return s;
-    }
-    
-    private void updateListaAlimento() {
-        areaCardapio.setText(cardapioToString());
-    }
-    
-    private void limpar() {
-        //campoCodigo.setText("");
-        campoQuantidade.setText("");
-        comboBoxIdoso.setSelectedIndex(0);
+    private void limparCadastro() {
+        campoNome.setText("");
+        listaCardapio.removeAll();
         comboBoxAlimento.setSelectedIndex(0);
-        areaCardapio.setText("");
+    }
+    
+    private void limparEdicao() {
+        campoNomeEdicao.setText("");
+        listaCardapioEdicao.removeAll();
+        comboBoxAlimentoEdicao.setSelectedIndex(0);
+        botaoConsultar.setEnabled(false);
+        listaItensEdicao.clear();
+        adicionados.clear();
+        removidos.clear();
+        habilitado(false);
+    }
+    
+    private void habilitado(boolean flag) {
+        campoNome.setEnabled(flag);
+        listaCardapio.setEnabled(flag);
+        comboBoxAlimentoEdicao.setEnabled(flag);
+        botaoAdicionarEdicao.setEnabled(false);
+        botaoRemoverEdicao.setEnabled(false);
+    }
+    
+    private void atualizaCardapio() {
+        listaCardapio.setListData(listaItens.toArray());
+    }
+    
+    private void atualizaCardapioEdicao() {
+        listaCardapioEdicao.setListData(listaItensEdicao.toArray());
     }
     
     /**
@@ -133,8 +112,8 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        areaCardapio = new javax.swing.JTextArea();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listaCardapio = new javax.swing.JList();
         botaoAdicionar = new javax.swing.JButton();
         botaoRemover = new javax.swing.JButton();
         botaoCadastrar = new javax.swing.JButton();
@@ -143,36 +122,40 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
         comboBoxAlimento = new javax.swing.JComboBox();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        areaCardapioEdicao = new javax.swing.JTextArea();
-        jComboBox1 = new javax.swing.JComboBox();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        listaCardapioEdicao = new javax.swing.JList();
+        comboBoxCardapio = new javax.swing.JComboBox();
         botaoAdicionarEdicao = new javax.swing.JButton();
         botaoRemoverEdicao = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        botaoSalvar = new javax.swing.JButton();
         botaoConsultar = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        campoNome1 = new javax.swing.JTextField();
+        campoNomeEdicao = new javax.swing.JTextField();
         comboBoxAlimentoEdicao = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Cadastra Prescrição Médica");
         setResizable(false);
 
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
+
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Cardápio"));
 
-        areaCardapio.setColumns(20);
-        areaCardapio.setRows(5);
-        jScrollPane2.setViewportView(areaCardapio);
+        jScrollPane1.setViewportView(listaCardapio);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
         );
 
         botaoAdicionar.setText("Adicionar");
@@ -247,23 +230,26 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Cardápio"));
 
-        areaCardapioEdicao.setColumns(20);
-        areaCardapioEdicao.setRows(5);
-        areaCardapioEdicao.setEnabled(false);
-        jScrollPane3.setViewportView(areaCardapioEdicao);
+        listaCardapioEdicao.setEnabled(false);
+        jScrollPane2.setViewportView(listaCardapioEdicao);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
         );
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione cardápio" }));
+        comboBoxCardapio.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione cardápio" }));
+        comboBoxCardapio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxCardapioActionPerformed(evt);
+            }
+        });
 
         botaoAdicionarEdicao.setText("Adicionar");
         botaoAdicionarEdicao.setEnabled(false);
@@ -281,15 +267,25 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Salvar alterações");
-        jButton1.setEnabled(false);
+        botaoSalvar.setText("Salvar alterações");
+        botaoSalvar.setEnabled(false);
+        botaoSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoSalvarActionPerformed(evt);
+            }
+        });
 
         botaoConsultar.setText("Consultar");
         botaoConsultar.setEnabled(false);
+        botaoConsultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoConsultarActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("Nome da refeição: ");
 
-        campoNome1.setEnabled(false);
+        campoNomeEdicao.setEnabled(false);
 
         comboBoxAlimentoEdicao.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecione alimento" }));
         comboBoxAlimentoEdicao.setEnabled(false);
@@ -302,16 +298,16 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(comboBoxCardapio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(botaoConsultar))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(18, 18, 18)
-                        .addComponent(campoNome1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(campoNomeEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1)
+                            .addComponent(botaoSalvar)
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -327,12 +323,12 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(comboBoxCardapio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoConsultar))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(campoNome1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(campoNomeEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
@@ -344,7 +340,7 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
                             .addComponent(comboBoxAlimentoEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(botaoAdicionarEdicao))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(botaoSalvar)
                 .addContainerGap())
         );
 
@@ -367,101 +363,186 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAdicionarActionPerformed
-        if(campoAddVazio()) {
-            JOptionPane.showMessageDialog(this, "Aviso: campos devem ser preenchidos para adicionar item!");
-        } 
-        else {
-            Alimento ali = (Alimento) comboBoxAlimento.getSelectedItem();
-            int qtd = Integer.parseInt(campoQuantidade.getText());
-            int numAli = ali.getCodigo();
-            ItemCardapio itmC = new ItemCardapio(cardapio, ali, qtd, numAli, refeicaoSelecionada());
-            if(refeicaoSelecionada().equals("Café da manhã")) {
-                listaItensCafe.add(itmC);
-            } else if(refeicaoSelecionada().equals("Almoço")) {
-                listaItensAlmoco.add(itmC);
-            } else {
-                listaItensJantar.add(itmC);
-            }
-            updateListaAlimento();
+        Alimento r;
+        if(comboBoxAlimento.getSelectedIndex() != 0) {
+            r = (Alimento) comboBoxAlimento.getSelectedItem();
         }
+        else {
+            Mensagens.campoInvalido(this, "Campo Alimento");
+            return;
+        }
+        ItemCardapio ic = new ItemCardapio();
+        ic.setNumeroAlimento(r.getCodigo());
+        ic.setCod(cod++);
+        ic.setAlimento(r);
+        listaItens.add(ic);
+        atualizaCardapio();
     }//GEN-LAST:event_botaoAdicionarActionPerformed
 
     private void botaoCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastrarActionPerformed
-        if(campoCadastrarVazio()) {
-            JOptionPane.showMessageDialog(this, "Aviso: campos obrigatórios devem ser preenchidos!");
+        Cardapio cardapio = new Cardapio();
+        if(!campoNome.getText().equals("")) {
+            //cardapio.setNome(campoID.getText());
         }
         else {
-            int cod = Integer.parseInt(campoCodigo.getText());
-            cardapio.setCodigo(cod);
-            cardapio.setIdoso((Idoso) comboBoxIdoso.getSelectedItem());
-            try {
-                ImplCardapioDAO.getInstance().inserir(cardapio);
-                for (Iterator<ItemCardapio> it = listaItensCafe.iterator(); it.hasNext();) {
-                    ItemCardapio itemCardapio = it.next();
-                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
-                }
-                for (Iterator<ItemCardapio> it = listaItensAlmoco.iterator(); it.hasNext();) {
-                    ItemCardapio itemCardapio = it.next();
-                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
-                }
-                for (Iterator<ItemCardapio> it = listaItensJantar.iterator(); it.hasNext();) {
-                    ItemCardapio itemCardapio = it.next();
-                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
-                }
-                limpar();
-            } catch(DAOException ex) {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
+            Mensagens.campoInvalido(this, "Campo Nome");
+            return;
+        }
+        if(listaItens.isEmpty()) {
+            Mensagens.campoInvalido(this, "Cardapio");
+            return;
+        }
+        try {
+            ImplCardapioDAO.getInstance().inserir(cardapio);
+            for (Iterator<ItemCardapio> it = listaItens.iterator(); it.hasNext();) {
+                ItemCardapio itemCardapio = it.next();
+                ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
             }
+            limparCadastro();
+        } catch(Exception ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
 
     private void botaoRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoRemoverActionPerformed
-        if(campoRemoverVazio()) {
-            JOptionPane.showMessageDialog(this, "Aviso: campos devem ser preenchidos para remover item!");
-        } 
+        if(!listaCardapio.isSelectionEmpty()) {
+            listaItens.remove((ItemCardapio) listaCardapio.getSelectedValue());
+            atualizaCardapio();
+        }
         else {
-            Alimento ali = (Alimento) comboBoxAlimento.getSelectedItem();
-            int numAli = ali.getCodigo();
-            ItemCardapio itmC = new ItemCardapio(cardapio, ali, 0, numAli, null);
-            listaItensCafe.remove(itmC);
-            listaItensAlmoco.remove(itmC);
-            listaItensJantar.remove(itmC);
-            updateListaAlimento();
+            Mensagens.campoInvalido(this, "Alimento Cardapio");
         }
     }//GEN-LAST:event_botaoRemoverActionPerformed
 
     private void botaoAdicionarEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAdicionarEdicaoActionPerformed
-        // TODO add your handling code here:
+        Alimento r;
+        if(comboBoxAlimentoEdicao.getSelectedIndex() != 0) {
+            r = (Alimento) comboBoxAlimentoEdicao.getSelectedItem();
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Alimento");
+            return;
+        }
+        ItemCardapio iC = new ItemCardapio();
+        iC.setNumeroAlimento(r.getCodigo());
+        iC.setCod(codEdicao++);
+        iC.setAlimento(r);
+        listaItensEdicao.add(iC);
+        adicionados.add(iC);
+        atualizaCardapioEdicao();
     }//GEN-LAST:event_botaoAdicionarEdicaoActionPerformed
 
     private void botaoRemoverEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoRemoverEdicaoActionPerformed
-        // TODO add your handling code here:
+        if(!listaCardapioEdicao.isSelectionEmpty()) {
+            listaItensEdicao.remove((ItemCardapio) listaCardapioEdicao.getSelectedValue());
+            removidos.add((ItemCardapio) listaCardapioEdicao.getSelectedValue());
+            atualizaCardapio();
+        }
+        else {
+            Mensagens.campoInvalido(this, "Alimento cardápio");
+        }
     }//GEN-LAST:event_botaoRemoverEdicaoActionPerformed
 
+    private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
+        cardapio = (Cardapio) comboBoxCardapio.getSelectedItem();
+        if(comboBoxCardapio.getSelectedIndex() != 0) {
+            
+            listaItensEdicao = new ArrayList<>();
+            try {
+                listaItensEdicao = ImplItemCardapioDAO.getInstance().encontrarTodos();
+
+                for (Iterator<ItemCardapio> it = listaItensEdicao.iterator(); it.hasNext();) {
+                    ItemCardapio itemCardapio = it.next();
+                    itemCardapio.setCod(codEdicao++);
+                }
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+            atualizaCardapioEdicao();
+            // campoNomeEdicao.setText(cardapio.getNome());
+            comboBoxAlimentoEdicao.setSelectedIndex(0);
+            habilitado(true);
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Cardápio");
+        }
+    }//GEN-LAST:event_botaoConsultarActionPerformed
+
+    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
+        Cardapio cardapio = new Cardapio();
+        if(!campoNomeEdicao.getText().equals("")) {
+            //prescricao.setID(campoIDEdicao.getText());
+        }
+        else {
+            Mensagens.campoInvalido(this, "Campo Nome");
+            return;
+        }
+        if(listaItensEdicao.isEmpty()) {
+            Mensagens.campoInvalido(this, "Cardápio");
+            return;
+        }
+        try {
+            ImplCardapioDAO.getInstance().atualizar(cardapio);
+            for (Iterator<ItemCardapio> it = removidos.iterator(); it.hasNext();) {
+                ItemCardapio itemCardapio = it.next();
+                ImplItemCardapioDAO.getInstance().remover(itemCardapio);
+            }
+            for (Iterator<ItemCardapio> it = adicionados.iterator(); it.hasNext();) {
+                ItemCardapio itemCardapio = it.next();
+                ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
+            }
+            limparEdicao();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_botaoSalvarActionPerformed
+
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        if(jTabbedPane1.getSelectedIndex() == 1) {
+            try {
+                List<Cardapio> lista = ImplCardapioDAO.getInstance().encontrarTodos();
+                for (Iterator<Cardapio> it = lista.iterator(); it.hasNext();) {
+                    Cardapio cardapio = it.next();
+                    comboBoxCardapio.addItem(cardapio);
+                }
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jTabbedPane1StateChanged
+
+    private void comboBoxCardapioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxCardapioActionPerformed
+        if(comboBoxCardapio.getSelectedIndex() != 0) {
+            botaoConsultar.setEnabled(true);
+        }
+        else {
+            botaoConsultar.setEnabled(false);
+        }
+    }//GEN-LAST:event_comboBoxCardapioActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea areaCardapio;
-    private javax.swing.JTextArea areaCardapioEdicao;
     private javax.swing.JButton botaoAdicionar;
     private javax.swing.JButton botaoAdicionarEdicao;
     private javax.swing.JButton botaoCadastrar;
     private javax.swing.JButton botaoConsultar;
     private javax.swing.JButton botaoRemover;
     private javax.swing.JButton botaoRemoverEdicao;
+    private javax.swing.JButton botaoSalvar;
     private javax.swing.JTextField campoNome;
-    private javax.swing.JTextField campoNome1;
+    private javax.swing.JTextField campoNomeEdicao;
     private javax.swing.JComboBox comboBoxAlimento;
     private javax.swing.JComboBox comboBoxAlimentoEdicao;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox comboBoxCardapio;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JList listaCardapio;
+    private javax.swing.JList listaCardapioEdicao;
     // End of variables declaration//GEN-END:variables
 }

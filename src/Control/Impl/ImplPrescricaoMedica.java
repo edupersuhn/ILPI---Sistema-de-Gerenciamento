@@ -193,7 +193,49 @@ public class ImplPrescricaoMedica implements IDAO<PrescricaoMedica> {
         }
     }
     
-    public List<ItemPrescricaoMedica> encontrarTodos(int codigo) throws DAOException, SQLException {
+    public List<PrescricaoMedica> encontrarTodos(int cdIdoso) throws DAOException, SQLException {
+        
+        
+        Connection con = ConectionManager.getInstance().getConexao();
+
+        PreparedStatement prepared;
+        ResultSet result;
+        List<PrescricaoMedica> lista = new ArrayList<>();
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from prescricao_medica "
+                       + "where COD_IDOSO = ?";
+            
+            prepared = con.prepareStatement(sql);
+            prepared.setInt(1, cdIdoso);
+
+            result = prepared.executeQuery();
+
+            PrescricaoMedica a = null;
+            while (result.next()) {
+                int codPrescricao = result.getInt("COD_PRESCRICAO");
+                int codIdoso = result.getInt("COD_IDOSO");
+                String dscObservacao = result.getString("DSC_OBSERVACAO");
+                Date datPrescricao = result.getDate("DAT_PRESCRICAO");
+                int horaPrescricao = result.getInt("HORA_PRESCRICAO");
+                Idoso idoso = ImplIdosoDAO.getInstance().encontrarPorCodigo(codIdoso);
+
+                a = new PrescricaoMedica(idoso, codPrescricao, dscObservacao, datPrescricao, horaPrescricao);
+                lista.add(a);
+            }
+            return lista;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
+        }
+    }
+    
+    public List<ItemPrescricaoMedica> encontrarTodosItens(int codigo) throws DAOException, SQLException {
         return ImplItemPrescricaoMedica.getInstance().encontrarTodos(codigo);
     }
 

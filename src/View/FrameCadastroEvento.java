@@ -416,7 +416,7 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
             return;
         }
         try {
-            ImplEventoDAO.getInstance().inserir(e, null);
+            ImplEventoDAO.getInstance().inserir(e);
             limparCadastro();
         } catch(Exception ex) {
             ex.printStackTrace();
@@ -502,7 +502,7 @@ public class FrameCadastroEvento extends javax.swing.JFrame {
             return;
         }
         try {
-            ImplEventoDAO.getInstance().atualizar(e, null);
+            ImplEventoDAO.getInstance().atualizar(e);
             limparEdicao();
             habilitado(false);
         } catch(Exception ex) {

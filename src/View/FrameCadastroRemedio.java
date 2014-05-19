@@ -271,7 +271,7 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
             ImplRemedioDAO.getInstance().inserir(r);
             limparCadastro();
             Mensagens.cadastradoComSucesso(this);
-        } catch(DAOException ex) {
+        } catch(Exception ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
@@ -304,7 +304,7 @@ public class FrameCadastroRemedio extends javax.swing.JFrame {
             limparCadastro();
             Mensagens.cadastradoComSucesso(this);
             habilitado(false);
-        } catch(DAOException ex) {
+        } catch(Exception ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoSalvarActionPerformed

@@ -18,6 +18,10 @@ public class Incidente {
     private Date dataIncidente;
     private String descricaoIncidente;
 
+    public Incidente() {
+        this(0, null, null, null, null);
+    }
+    
     public Incidente(int codigoIncidente, Funcionario func, Idoso idoso, Date dataIncidente, String descricaoIncidente) {
         this.codigoIncidente = codigoIncidente;
         this.func = func;

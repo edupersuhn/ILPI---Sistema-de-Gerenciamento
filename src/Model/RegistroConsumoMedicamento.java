@@ -5,6 +5,7 @@
 package Model;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 
 
@@ -56,6 +57,15 @@ public class RegistroConsumoMedicamento {
 
     public void setItem(ItemPrescricaoMedica item) {
         this.item = item;
+    }
+    
+    public String toString() {
+        StringBuffer s = new StringBuffer();
+        s.append(item.getRemedio().getNomeRemedio() + " utilizado em ");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+        s.append(format.format(dataUtilizacao));
+        s.append(" as " + horaUtilizacao);
+        return s.toString(); 
     }
     
 }
