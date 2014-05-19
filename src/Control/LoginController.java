@@ -43,7 +43,11 @@ public class LoginController {
                 }
             }
             return false;
+<<<<<<< HEAD
         } catch (Exception ex) {
+=======
+        } catch (DAOException | SQLException ex) {
+>>>>>>> 12f403a694b2c33e40a8ed6f73884abe01637a25
             //Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Erro ao realizar login");
             return false;

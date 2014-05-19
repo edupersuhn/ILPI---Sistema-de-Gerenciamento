@@ -29,11 +29,8 @@ import java.util.List;
  */
 public class FrameCadastroPrescricao extends javax.swing.JFrame {
     
-    private List<ItemPrescricaoMedica> listaItens;
-    private List<ItemPrescricaoMedica> listaItensEdicao;
-    private List<ItemPrescricaoMedica> removidos;
-    private List<ItemPrescricaoMedica> adicionados;
-    
+    private ArrayList<ItemPrescricaoMedica> listaItens;
+    private ArrayList<ItemPrescricaoMedica> listaItensEdicao;
     private PrescricaoMedica prescricao;
     
     private int cod = 0;
@@ -49,8 +46,6 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         initComponents();
         listaItens = new ArrayList<>();
         listaItensEdicao = new ArrayList<>();
-        removidos = new ArrayList<>();
-        adicionados = new ArrayList<>();
         try {
             List<Idoso> listaI = ImplIdosoDAO.getInstance().encontrarTodosIdosos();
             if(listaI != null) {
@@ -635,7 +630,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -657,13 +652,6 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
             return;
         }
         ItemPrescricaoMedica ipm = new ItemPrescricaoMedica();
-        if(ComponentValidator.time(campoHora)) {
-            //ipm.setHora(campoHora.getText());
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Hora");
-            return;
-        }
         ipm.setNumeroRemedio(r.getCodigo());
         if(!areaObs.getText().equals("")) {
             ipm.setObservacaoRemedio(areaObs.getText());
@@ -744,13 +732,6 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
             return;
         }
         ItemPrescricaoMedica ipm = new ItemPrescricaoMedica();
-        if(ComponentValidator.time(campoHoraEdicao)) {
-            //ipm.setHora(campoHoraEdicao.getText());
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Hora");
-            return;
-        }
         ipm.setNumeroRemedio(r.getCodigo());
         if(!areaObsEdicao.getText().equals("")) {
             ipm.setObservacaoRemedio(areaObsEdicao.getText());
@@ -769,14 +750,12 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         ipm.setCod(codEdicao++);
         ipm.setRemedio(r);
         listaItensEdicao.add(ipm);
-        adicionados.add(ipm);
         atualizaPrescricaoEdicao();
     }//GEN-LAST:event_botaoAdicionarEdicaoActionPerformed
 
     private void botaoRemoverEdicaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoRemoverEdicaoActionPerformed
         if(!listaPrescricaoEdicao.isSelectionEmpty()) {
             listaItensEdicao.remove((ItemPrescricaoMedica) listaPrescricaoEdicao.getSelectedValue());
-            removidos.add((ItemPrescricaoMedica) listaPrescricaoEdicao.getSelectedValue());
             atualizaPrescricao();
         }
         else {
@@ -813,16 +792,13 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
             areaObsEdicao.setText(prescricao.getObservacao());
             
             listaItensEdicao = new ArrayList<>();
-            try {
-                listaItensEdicao = ImplPrescricaoMedica.getInstance().encontrarTodos(prescricao.getCodigoPrescricao());
-
-                for (Iterator<ItemPrescricaoMedica> it = listaItensEdicao.iterator(); it.hasNext();) {
-                    ItemPrescricaoMedica itemPrescricaoMedica = it.next();
-                    itemPrescricaoMedica.setCod(codEdicao++);
-                }
-            } catch(Exception ex) {
-                ex.printStackTrace();
+            // listaItensEdicao = ImplItemPrescricaoMedica.getInstance().encontrarTodosPrescricao(PrescricaoMedica prescricao);
+            
+            for (Iterator<ItemPrescricaoMedica> it = listaItensEdicao.iterator(); it.hasNext();) {
+                ItemPrescricaoMedica itemPrescricaoMedica = it.next();
+                itemPrescricaoMedica.setCod(codEdicao++);
             }
+            
             atualizaPrescricaoEdicao();
             SimpleDateFormat format = new SimpleDateFormat("DD//YYYY");
             campoDataEdicao.setText(format.format(prescricao.getDataPrescricao()));
@@ -864,13 +840,9 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         }
         try {
             ImplPrescricaoMedica.getInstance().atualizar(prescricao);
-            for (Iterator<ItemPrescricaoMedica> it = removidos.iterator(); it.hasNext();) {
+            for (Iterator<ItemPrescricaoMedica> it = listaItensEdicao.iterator(); it.hasNext();) {
                 ItemPrescricaoMedica itemPrescricaoMedica = it.next();
-                ImplItemPrescricaoMedica.getInstance().remover(itemPrescricaoMedica);
-            }
-            for (Iterator<ItemPrescricaoMedica> it = adicionados.iterator(); it.hasNext();) {
-                ItemPrescricaoMedica itemPrescricaoMedica = it.next();
-                ImplItemPrescricaoMedica.getInstance().inserir(itemPrescricaoMedica);
+                ImplItemPrescricaoMedica.getInstance().atualizar(itemPrescricaoMedica);
             }
             limparEdicao();
         } catch(Exception ex) {
