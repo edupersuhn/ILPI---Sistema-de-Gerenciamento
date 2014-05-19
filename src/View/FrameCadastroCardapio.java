@@ -15,9 +15,12 @@ import Model.Alimento;
 import Model.Cardapio;
 import Model.Idoso;
 import Model.ItemCardapio;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -54,7 +57,7 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
                 Alimento alimento = it.next();
                 comboBoxAlimento.addItem(alimento);
             }
-        } catch(DAOException ex) {
+        } catch( DAOException | SQLException ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
@@ -595,15 +598,21 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
         else {
             Alimento ali = (Alimento) comboBoxAlimento.getSelectedItem();
             int qtd = Integer.parseInt(campoQuantidade.getText());
-            int numAli = ali.getCodigo();
-            ItemCardapio itmC = new ItemCardapio(cardapio, ali, qtd, numAli, refeicaoSelecionada());
-            if(refeicaoSelecionada().equals("Café da manhã")) {
-                listaItensCafe.add(itmC);
-            } else if(refeicaoSelecionada().equals("Almoço")) {
-                listaItensAlmoco.add(itmC);
-            } else {
-                listaItensJantar.add(itmC);
+            int numAli;
+            try {
+                numAli = ImplItemCardapioDAO.getInstance().encontrarMaiorNumero(cardapio);
+                ItemCardapio itmC = new ItemCardapio(cardapio, ali, qtd, numAli);
+            } catch (    SQLException | DAOException ex) {
+                System.out.println("Erro ao consultar maior numero de item no cardapio");
+                ex.printStackTrace();
             }
+//            if(refeicaoSelecionada().equals("Café da manhã")) {
+//                listaItensCafe.add(itmC);
+//            } else if(refeicaoSelecionada().equals("Almoço")) {
+//                listaItensAlmoco.add(itmC);
+//            } else {
+//                listaItensJantar.add(itmC);
+//            }
             updateListaAlimento();
         }
     }//GEN-LAST:event_botaoAdicionarActionPerformed
@@ -613,25 +622,24 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Aviso: campos obrigatórios devem ser preenchidos!");
         }
         else {
-            int cod = Integer.parseInt(campoCodigo.getText());
-            cardapio.setCodigo(cod);
-            cardapio.setIdoso((Idoso) comboBoxIdoso.getSelectedItem());
             try {
+                int cod = ImplCardapioDAO.getInstance().encontraMaiorNumero();
+                cardapio.setCodigo(cod);
                 ImplCardapioDAO.getInstance().inserir(cardapio);
-                for (Iterator<ItemCardapio> it = listaItensCafe.iterator(); it.hasNext();) {
-                    ItemCardapio itemCardapio = it.next();
-                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
-                }
-                for (Iterator<ItemCardapio> it = listaItensAlmoco.iterator(); it.hasNext();) {
-                    ItemCardapio itemCardapio = it.next();
-                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
-                }
-                for (Iterator<ItemCardapio> it = listaItensJantar.iterator(); it.hasNext();) {
-                    ItemCardapio itemCardapio = it.next();
-                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
-                }
+//                for (Iterator<ItemCardapio> it = listaItensCafe.iterator(); it.hasNext();) {
+//                    ItemCardapio itemCardapio = it.next();
+//                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
+//                }
+//                for (Iterator<ItemCardapio> it = listaItensAlmoco.iterator(); it.hasNext();) {
+//                    ItemCardapio itemCardapio = it.next();
+//                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
+//                }
+//                for (Iterator<ItemCardapio> it = listaItensJantar.iterator(); it.hasNext();) {
+//                    ItemCardapio itemCardapio = it.next();
+//                    ImplItemCardapioDAO.getInstance().inserir(itemCardapio);
+//                }
                 limpar();
-            } catch(DAOException ex) {
+            } catch(DAOException  | SQLException ex) {
                 System.out.println(ex.getMessage());
                 ex.printStackTrace();
             }
@@ -645,7 +653,7 @@ public class FrameCadastroCardapio extends javax.swing.JFrame {
         else {
             Alimento ali = (Alimento) comboBoxAlimento.getSelectedItem();
             int numAli = ali.getCodigo();
-            ItemCardapio itmC = new ItemCardapio(cardapio, ali, 0, numAli, null);
+            ItemCardapio itmC = new ItemCardapio(cardapio, ali, 0, numAli);
             listaItensCafe.remove(itmC);
             listaItensAlmoco.remove(itmC);
             listaItensJantar.remove(itmC);

@@ -14,6 +14,7 @@ import Model.Quarto;
 import Util.ComponentValidator;
 import Util.DataConverter;
 import Util.Mensagens;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 /**
@@ -439,7 +440,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(44, 44, 44)
                 .addComponent(botaoCadastrar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Cadastrar", jPanel4);
@@ -837,7 +838,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             ImplQuartoDAO.getInstance().atualizar(q);
             limparCadastro();
             Mensagens.cadastradoComSucesso(this);
-        } catch(DAOException ex) {
+        } catch(DAOException | SQLException ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
@@ -1001,7 +1002,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             quarto = q;
             limparEdicao();
             Mensagens.alteradoComSucesso(this);
-        } catch(DAOException ex) {
+        } catch(DAOException | SQLException ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoSalvarActionPerformed

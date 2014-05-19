@@ -64,7 +64,7 @@ public class ItemCardapio {
             throw new IllegalArgumentException();
         }
     }
-    
+
     @Override
     public String toString() {
         return "Alimento: " + alimento.getNomeAlimento() + " Quantidade: " + qtdProduzida;

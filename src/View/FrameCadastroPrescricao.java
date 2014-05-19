@@ -628,7 +628,7 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -650,13 +650,6 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
             return;
         }
         ItemPrescricaoMedica ipm = new ItemPrescricaoMedica();
-        if(ComponentValidator.time(campoHora)) {
-            ipm.setHora(campoHora.getText());
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Hora");
-            return;
-        }
         ipm.setNumeroRemedio(r.getCodigo());
         if(!areaObs.getText().equals("")) {
             ipm.setObservacaoRemedio(areaObs.getText());
@@ -737,13 +730,6 @@ public class FrameCadastroPrescricao extends javax.swing.JFrame {
             return;
         }
         ItemPrescricaoMedica ipm = new ItemPrescricaoMedica();
-        if(ComponentValidator.time(campoHoraEdicao)) {
-            ipm.setHora(campoHoraEdicao.getText());
-        }
-        else {
-            Mensagens.campoInvalido(this, "Campo Hora");
-            return;
-        }
         ipm.setNumeroRemedio(r.getCodigo());
         if(!areaObsEdicao.getText().equals("")) {
             ipm.setObservacaoRemedio(areaObsEdicao.getText());

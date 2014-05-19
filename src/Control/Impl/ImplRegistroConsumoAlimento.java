@@ -41,33 +41,22 @@ public class ImplRegistroConsumoAlimento implements IDAO<RegistroConsumoAlimento
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            prepared = con.prepareStatement("insert into registro_consumo_alimento ("
-                    + "COD_CARDAPIO,"
-                    + "NUM_ALIMENTO,"
-                    + "DAT_CONSUMO,"
-                    + "NUM_HORA_CONSUMO,"
-                    + "COD_FUNCIONARIO) "
-                    + "values (?,?,?,?,?)");
-            
-            prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
-            prepared.setInt(2, reg.getItem().getNumeroAlimento());
-            prepared.setDate(3, reg.getDataConsumo());
-            prepared.setInt(4, reg.getHoraConsumo());
-            prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
+        //TODO Fazer o insert do idoso aqui
+        prepared = con.prepareStatement("insert into registro_consumo_alimento ("
+                + "COD_CARDAPIO,"
+                + "NUM_ALIMENTO,"
+                + "DAT_CONSUMO,"
+                + "NUM_HORA_CONSUMO,"
+                + "COD_FUNCIONARIO) "
+                + "values (?,?,?,?,?)");
 
-            prepared.execute();
-            
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
-        }
+        prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
+        prepared.setInt(2, reg.getItem().getNumeroAlimento());
+        prepared.setDate(3, reg.getDataConsumo());
+        prepared.setInt(4, reg.getHoraConsumo());
+        prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
+
+        prepared.execute();
     }
 
     @Override
@@ -76,49 +65,39 @@ public class ImplRegistroConsumoAlimento implements IDAO<RegistroConsumoAlimento
         
         PreparedStatement prepared;
         ResultSet result;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            String sql = "select * from registro_consumo_alimento"
-                    + " where COD_CARDAPIO = ? "
-                    + "   and NUM_ALIMENTO = ? ";
+        //TODO Fazer o insert do idoso aqui
+        String sql = "select * from registro_consumo_alimento"
+                + " where COD_CARDAPIO = ? "
+                + "   and NUM_ALIMENTO = ? ";
+        prepared = con.prepareStatement(sql);
+
+        prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
+        prepared.setInt(2, reg.getItem().getNumeroAlimento());
+
+        result = prepared.executeQuery();
+
+        if(!result.next()){
+            inserir(reg);
+        }else{
+            sql =  "update registro_consumo_alimento "
+                    + "set COD_CARDAPIO = ?,"
+                        + "NUM_ALIMENTO = ?,"
+                        + "DAT_CONSUMO = ?,"
+                        + "NUM_HORA_CONSUMO = ? "
+                        + "COD_FUNCIONARIO = ? "
+                  + "where COD_CARDAPIO = ?"
+                   + " and NUM_ALIMENTO = ?";
+
             prepared = con.prepareStatement(sql);
-            
             prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
             prepared.setInt(2, reg.getItem().getNumeroAlimento());
-            
-            result = prepared.executeQuery();
-            
-            if(!result.next()){
-                inserir(reg);
-            }else{
-                sql =  "update registro_consumo_alimento "
-                        + "set COD_CARDAPIO = ?,"
-                            + "NUM_ALIMENTO = ?,"
-                            + "DAT_CONSUMO = ?,"
-                            + "NUM_HORA_CONSUMO = ? "
-                            + "COD_FUNCIONARIO = ? "
-                      + "where COD_CARDAPIO = ?"
-                       + " and NUM_ALIMENTO = ?";
-                
-                prepared = con.prepareStatement(sql);
-                prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
-                prepared.setInt(2, reg.getItem().getNumeroAlimento());
-                prepared.setDate(3, reg.getDataConsumo());
-                prepared.setInt(4, reg.getHoraConsumo());
-                prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
-                prepared.setInt(6, reg.getItem().getCardapio().getCodigo());
-                prepared.setInt(7, reg.getItem().getNumeroAlimento());
-                
-                prepared.execute();
-            }
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
+            prepared.setDate(3, reg.getDataConsumo());
+            prepared.setInt(4, reg.getHoraConsumo());
+            prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
+            prepared.setInt(6, reg.getItem().getCardapio().getCodigo());
+            prepared.setInt(7, reg.getItem().getNumeroAlimento());
+
+            prepared.execute();
         }
     }
 
@@ -128,43 +107,32 @@ public class ImplRegistroConsumoAlimento implements IDAO<RegistroConsumoAlimento
         
         PreparedStatement prepared;
         ResultSet result;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            String sql = "select * from registro_consumo_alimento"
-                       + " where COD_CARDAPIO = ? "
-                       + "   and NUM_ALIMENTO = ? ";
-            
+        //TODO Fazer o insert do idoso aqui
+        String sql = "select * from registro_consumo_alimento"
+                   + " where COD_CARDAPIO = ? "
+                   + "   and NUM_ALIMENTO = ? ";
+
+        prepared = con.prepareStatement(sql);
+
+        prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
+        prepared.setInt(2, reg.getItem().getNumeroAlimento());
+
+        result = prepared.executeQuery();
+
+        if(result.next()){
+            sql = "delete registro_consumo_alimento "
+                 + "where COD_CARDAPIO = ? "
+                 + "  and NUM_ALIMENTO = ? ";
+
             prepared = con.prepareStatement(sql);
-            
             prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
             prepared.setInt(2, reg.getItem().getNumeroAlimento());
-            
-            result = prepared.executeQuery();
-            
-            if(result.next()){
-                sql = "delete registro_consumo_alimento "
-                     + "where COD_CARDAPIO = ? "
-                     + "  and NUM_ALIMENTO = ? ";
-                
-                prepared = con.prepareStatement(sql);
-                prepared.setInt(1, reg.getItem().getCardapio().getCodigo());
-                prepared.setInt(2, reg.getItem().getNumeroAlimento());
-                
-                prepared.execute();
-                
-            }else{
-                throw new DAOException("Não foi possível encontrar o registro de consumo de alimento"
-                        + " informado! Cod: " + reg.toString());
-            }
-                
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
+
+            prepared.execute();
+
+        }else{
+            throw new DAOException("Não foi possível encontrar o registro de consumo de alimento"
+                    + " informado! Cod: " + reg.toString());
         }
     }
 
@@ -177,48 +145,38 @@ public class ImplRegistroConsumoAlimento implements IDAO<RegistroConsumoAlimento
         
         PreparedStatement prepared;
         ResultSet result;
-        try {
-            //TODO Fazer o insert do idoso aqui
-            String sql = "select * from registro_consumo_alimento"
-                       + " where COD_CARDAPIO = ? "
-                       + "   and NUM_ALIMENTO = ? ";
-            
-            prepared = con.prepareStatement(sql);
-            
-            prepared.setInt(1, codigo);
-            prepared.setInt(2, numAlimento);
-            
-            result = prepared.executeQuery();
-            
-            RegistroConsumoAlimento a = null;
-            while(result.next()){
-                
-                int codigoCardapio = result.getInt("COD_CARDAPIO");
-                int numAli = result.getInt("NUM_ALIMENTO");
-                ItemCardapio item = ImplItemCardapioDAO.getInstance().encontrarPorCodigo(codigoCardapio, numAli);
-                
-                Date datConsumo = result.getDate("DAT_CONSUMO");
-                int numHoraConsumo = result.getInt("NUM_HORA_CONSUMO");
-                
-                int codFunc = result.getInt("COD_FUNCIONARIO");
-                Funcionario func = ImplFuncionarioDAO.getInstance().encontrarPorCodigo(codFunc);
-                
-                a = new RegistroConsumoAlimento(func, item, datConsumo,numHoraConsumo);
-            }
-            
-            if(a == null){
-                throw new DAOException("Não foi possível o encontrar registro de"
-                        + " consumo de alimento! Cod = " + codigo);
-            }
-            return a;
-        } finally {
-            try {
-                con.rollback();
-            } catch (SQLException ex1) {
-                System.out.println("Erro ao realizar rollback! ");
-                System.out.println(ex1.getMessage());
-                ex1.printStackTrace();
-            }
+        //TODO Fazer o insert do idoso aqui
+        String sql = "select * from registro_consumo_alimento"
+                   + " where COD_CARDAPIO = ? "
+                   + "   and NUM_ALIMENTO = ? ";
+
+        prepared = con.prepareStatement(sql);
+
+        prepared.setInt(1, codigo);
+        prepared.setInt(2, numAlimento);
+
+        result = prepared.executeQuery();
+
+        RegistroConsumoAlimento a = null;
+        while(result.next()){
+
+            int codigoCardapio = result.getInt("COD_CARDAPIO");
+            int numAli = result.getInt("NUM_ALIMENTO");
+            ItemCardapio item = ImplItemCardapioDAO.getInstance().encontrarPorCodigo(codigoCardapio, numAli);
+
+            Date datConsumo = result.getDate("DAT_CONSUMO");
+            int numHoraConsumo = result.getInt("NUM_HORA_CONSUMO");
+
+            int codFunc = result.getInt("COD_FUNCIONARIO");
+            Funcionario func = ImplFuncionarioDAO.getInstance().encontrarPorCodigo(codFunc);
+
+            a = new RegistroConsumoAlimento(func, item, datConsumo,numHoraConsumo);
         }
+
+        if(a == null){
+            throw new DAOException("Não foi possível o encontrar registro de"
+                    + " consumo de alimento! Cod = " + codigo);
+        }
+        return a;
     }
 }
