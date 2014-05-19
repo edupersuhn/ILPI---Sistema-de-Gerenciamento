@@ -14,7 +14,6 @@ import Model.Quarto;
 import Util.ComponentValidator;
 import Util.DataConverter;
 import Util.Mensagens;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 /**
@@ -440,7 +439,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(44, 44, 44)
                 .addComponent(botaoCadastrar)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Cadastrar", jPanel4);
@@ -838,11 +837,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             ImplQuartoDAO.getInstance().atualizar(q);
             limparCadastro();
             Mensagens.cadastradoComSucesso(this);
-<<<<<<< HEAD
         } catch(Exception ex) {
-=======
-        } catch(DAOException | SQLException ex) {
->>>>>>> 12f403a694b2c33e40a8ed6f73884abe01637a25
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
@@ -903,14 +898,14 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             if(idoso != null) {
                 habilitado(true);
                 campoCPFEdicao.setText(idoso.getCpf());
-                campoDataNascimentoEdicao.setText(idoso.getCpf());
-                campoEnderecoParenteEdicao.setText(idoso.getCpf());
-                campoFoneParenteEdicao.setText(idoso.getCpf());
-                campoLocOrigemEdicao.setText(idoso.getCpf());
-                campoNomeEdicao.setText(idoso.getCpf());
-                campoNomeParenteEdicao.setText(idoso.getCpf());
-                campoRGEdicao.setText(idoso.getCpf());
-                checkBoxAcamadoEdicao.setText(idoso.getCpf());
+                campoDataNascimentoEdicao.setText(DataConverter.sqlDateTypeToString(idoso.getDataNascimento()));
+                campoEnderecoParenteEdicao.setText(idoso.getEndParente());
+                campoFoneParenteEdicao.setText(idoso.getNumTelefoneParente());
+                campoLocOrigemEdicao.setText(idoso.getLocalOrigem());
+                campoNomeEdicao.setText(idoso.getNomeIdoso());
+                campoNomeParenteEdicao.setText(idoso.getNomeParenteResponsavel());
+                campoRGEdicao.setText(idoso.getRg() + "");
+                checkBoxAcamadoEdicao.setSelected(idoso.getAcamado());
                 // comboBoxQuartoEdicao.setSelectedItem(idoso.getQuarto);
                 // quarto = idoso.getQuarto();
             }
@@ -1006,11 +1001,7 @@ public class FrameCadastroIdoso extends javax.swing.JFrame {
             quarto = q;
             limparEdicao();
             Mensagens.alteradoComSucesso(this);
-<<<<<<< HEAD
         } catch(Exception ex) {
-=======
-        } catch(DAOException | SQLException ex) {
->>>>>>> 12f403a694b2c33e40a8ed6f73884abe01637a25
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoSalvarActionPerformed

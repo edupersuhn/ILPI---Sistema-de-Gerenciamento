@@ -9,8 +9,7 @@ package View;
 import Control.Impl.Exception.DAOException;
 import Control.Impl.ImplAlimentoDAO;
 import Model.Alimento;
-import java.sql.SQLException;
-
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -244,29 +243,7 @@ public class FrameCadastroAlimento extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastrarActionPerformed
-        Alimento a = new Alimento();
-        if(campoNome != null && campoNome.getText().isEmpty()){
-            System.out.println("Nome do Alimento obrigatório!");
-            return;
-        }
-        if(campoQntEstoque != null && campoQntEstoque.getText().isEmpty()){
-            System.out.println("Quantidade em Estoque obrigatório!");
-            return;
-        }
-        if(campoInfNutricional != null && campoInfNutricional.getText().isEmpty()){
-            System.out.println("Informação Nutricional obrigatório!");
-            return;
-        }
-        try{
-            int cod = ImplAlimentoDAO.getInstance().encontrarCodMax();
-            a.setCodigo(cod);
-            a.setNomeAlimento(campoNome.getText());
-            a.setQtdEstoque(Integer.parseInt(campoQntEstoque.getText()));
-            a.setInfoNutricional(campoInfNutricional.getText());
-            ImplAlimentoDAO.getInstance().inserir(a);
-        }catch(DAOException | SQLException ex){
-            ex.printStackTrace();
-        }
+        
     }//GEN-LAST:event_botaoCadastrarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
