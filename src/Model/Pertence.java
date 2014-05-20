@@ -15,6 +15,13 @@ public class Pertence {
     private String nomePertence;
     private String descricao;
 
+    public Pertence(Idoso idoso, String nomePertence, String descricao) {
+        this.idoso = idoso;
+        this.numeroPertence = 0;
+        this.nomePertence = nomePertence;
+        this.descricao = descricao;
+    }
+    
     public Pertence(Idoso idoso, int numeroPertence, String nomePertence, String descricao) {
         this.idoso = idoso;
         this.numeroPertence = numeroPertence;

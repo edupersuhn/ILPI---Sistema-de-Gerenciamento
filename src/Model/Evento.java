@@ -21,6 +21,10 @@ public class Evento {
     private String nomeEvento;
     private String descricaoEvento;
 
+    public Evento() {
+        this(0, null, null, null, null, null);
+    }
+    
     public Evento(int codigo, Funcionario func, List<Idoso> listaIdosos, Date dataEvento, String nomeEvento, String descricaoEvento) {
         this.codigo = codigo;
         this.func = func;

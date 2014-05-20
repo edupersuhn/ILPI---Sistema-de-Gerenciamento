@@ -156,4 +156,13 @@ public class Idoso implements Comparable<Idoso> {
         return nomeIdoso;
     }
     
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof Idoso) {
+            Idoso i = (Idoso) o;
+            return codIdoso == i.getCodIdoso();
+        }
+        else return false;
+    }
+    
 }

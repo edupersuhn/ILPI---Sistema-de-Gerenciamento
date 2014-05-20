@@ -38,22 +38,33 @@ public class ImplRegistroConsumoMedicamento implements IDAO<RegistroConsumoMedic
         Connection con = ConectionManager.getInstance().getConexao();
         
         PreparedStatement prepared;
-        //TODO Fazer o insert do idoso aqui
-        prepared = con.prepareStatement("insert into registro_consumo_medicamento ("
-                + "COD_PRESCRICAO,"
-                + "NUM_REMEDIO,"
-                + "DAT_UTILIZACAO,"
-                + "HOR_UTILIZACAO,"
-                + "COD_FUNCIONARIO) "
-                + "values (?,?,?,?,?)");
+        try {
+            //TODO Fazer o insert do idoso aqui
+            prepared = con.prepareStatement("insert into registro_consumo_medicamento ("
+                    + "COD_PRESCRICAO,"
+                    + "NUM_REMEDIO,"
+                    + "DAT_UTILIZACAO,"
+                    + "HOR_UTILIZACAO,"
+                    + "COD_FUNCIONARIO) "
+                    + "values (?,?,?,?,?)");
+            
+            prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
+            prepared.setInt(2, reg.getItem().getNumeroRemedio());
+            prepared.setDate(3, reg.getDataUtilizacao());
+            prepared.setInt(4, reg.getHoraUtilizacao());
+            prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
 
-        prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
-        prepared.setInt(2, reg.getItem().getNumeroRemedio());
-        prepared.setDate(3, reg.getDataUtilizacao());
-        prepared.setInt(4, reg.getHoraUtilizacao());
-        prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
-
-        prepared.execute();
+            prepared.execute();
+            
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -62,38 +73,48 @@ public class ImplRegistroConsumoMedicamento implements IDAO<RegistroConsumoMedic
         
         PreparedStatement prepared;
         ResultSet result;
-        //TODO Fazer o insert do idoso aqui
-        String sql = "select * from registro_consumo_medicamento"
-                + " where COD_PRESCRICAO = ? "
-                + "   and NUM_REMEDIO = ? ";
-        prepared = con.prepareStatement(sql);
-
-        prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
-        prepared.setInt(2, reg.getItem().getNumeroRemedio());
-
-        result = prepared.executeQuery();
-
-        if(!result.next()){
-            inserir(reg);
-        }else{
-            sql =  "update registro_consumo_medicamento "
-                    + "set COD_PRESCRICAO = ?,"
-                        + "NUM_PRESCRICAO = ?,"
-                        + "DAT_UTILIZACAO = ?,"
-                        + "HOR_UTILIZACAO = ?,"
-                        + "COD_FUNCIONARIO = ? "
-                  + "where COD_PRESCRICAO = ? "
-                    + "and NUM_PRESCRICAO = ? ";
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from registro_consumo_medicamento"
+                    + " where COD_PRESCRICAO = ? "
+                    + "   and NUM_REMEDIO = ? ";
             prepared = con.prepareStatement(sql);
+            
             prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
             prepared.setInt(2, reg.getItem().getNumeroRemedio());
-            prepared.setDate(3, reg.getDataUtilizacao());
-            prepared.setInt(4, reg.getHoraUtilizacao());
-            prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
-            prepared.setInt(6, reg.getItem().getPrescricao().getCodigoPrescricao());
-            prepared.setInt(7, reg.getItem().getNumeroRemedio());
-
-            prepared.execute();
+            
+            result = prepared.executeQuery();
+            
+            if(!result.next()){
+                inserir(reg);
+            }else{
+                sql =  "update registro_consumo_medicamento "
+                        + "set COD_PRESCRICAO = ?,"
+                            + "NUM_PRESCRICAO = ?,"
+                            + "DAT_UTILIZACAO = ?,"
+                            + "HOR_UTILIZACAO = ?,"
+                            + "COD_FUNCIONARIO = ? "
+                      + "where COD_PRESCRICAO = ? "
+                        + "and NUM_PRESCRICAO = ? ";
+                prepared = con.prepareStatement(sql);
+                prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
+                prepared.setInt(2, reg.getItem().getNumeroRemedio());
+                prepared.setDate(3, reg.getDataUtilizacao());
+                prepared.setInt(4, reg.getHoraUtilizacao());
+                prepared.setInt(5, reg.getFuncionario().getCodFuncionario());
+                prepared.setInt(6, reg.getItem().getPrescricao().getCodigoPrescricao());
+                prepared.setInt(7, reg.getItem().getNumeroRemedio());
+                
+                prepared.execute();
+            }
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
@@ -103,30 +124,41 @@ public class ImplRegistroConsumoMedicamento implements IDAO<RegistroConsumoMedic
         
         PreparedStatement prepared;
         ResultSet result;
-        //TODO Fazer o insert do idoso aqui
-        String sql = "select * from registro_consumo_medicamento"
-                + " where COD_PRESCRICAO = ? "
-                + "   and NUM_REMEDIO = ? ";
-        prepared = con.prepareStatement(sql);
-
-        prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
-        prepared.setInt(2, reg.getItem().getNumeroRemedio());
-
-        result = prepared.executeQuery();
-
-        if(result.next()){
-            sql = "delete registro_consumo_medicamento "
-                 + "where COD_PRESCRICAO = ? "
-                 + "  and NUM_PRESCRICAO = ? ";
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from registro_consumo_medicamento"
+                    + " where COD_PRESCRICAO = ? "
+                    + "   and NUM_REMEDIO = ? ";
             prepared = con.prepareStatement(sql);
+            
             prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
             prepared.setInt(2, reg.getItem().getNumeroRemedio());
-
-            prepared.execute();
-        }else{
-            throw new DAOException("Não foi possível encontrar o cardapio informado! Cod: " 
-                    + reg.getItem().getPrescricao().getCodigoPrescricao() + " - " 
-                    + reg.getItem().getNumeroRemedio());
+            
+            result = prepared.executeQuery();
+            
+            if(result.next()){
+                sql = "delete registro_consumo_medicamento "
+                     + "where COD_PRESCRICAO = ? "
+                     + "  and NUM_PRESCRICAO = ? ";
+                prepared = con.prepareStatement(sql);
+                prepared.setInt(1, reg.getItem().getPrescricao().getCodigoPrescricao());
+                prepared.setInt(2, reg.getItem().getNumeroRemedio());
+                
+                prepared.execute();
+            }else{
+                throw new DAOException("Não foi possível encontrar o cardapio informado! Cod: " 
+                        + reg.getItem().getPrescricao().getCodigoPrescricao() + " - " 
+                        + reg.getItem().getNumeroRemedio());
+            }
+                
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 

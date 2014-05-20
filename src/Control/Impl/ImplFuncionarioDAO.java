@@ -39,22 +39,33 @@ public class ImplFuncionarioDAO implements IDAO<Funcionario> {
         
         PreparedStatement prepared;
         
-        //TODO Fazer o insert do idoso aqui
-        prepared = con.prepareStatement("insert into Funcionario ("
-                + "COD_FUNCIONARIO,"
-                + "NOM_FUNCIONARIO,"
-                + "NOM_FUNCAO,"
-                + "ENDERECO,"
-                + "NUM_TELEFONE) "
-                + "values (?,?,?,?,?)");
+        try {
+            //TODO Fazer o insert do idoso aqui
+            prepared = con.prepareStatement("insert into Funcionario ("
+                    + "COD_FUNCIONARIO,"
+                    + "NOM_FUNCIONARIO,"
+                    + "NOM_FUNCAO,"
+                    + "ENDERECO,"
+                    + "NUM_TELEFONE) "
+                    + "values (?,?,?,?,?)");
+            
+            prepared.setInt(1, func.getCodFuncionario());
+            prepared.setString(2, func.getNomeFuncionario());
+            prepared.setString(3, func.getNomeFuncao());
+            prepared.setString(4, func.getEndereco());
+            prepared.setLong(5, func.getTelefone());
 
-        prepared.setInt(1, func.getCodFuncionario());
-        prepared.setString(2, func.getNomeFuncionario());
-        prepared.setString(3, func.getNomeFuncao());
-        prepared.setString(4, func.getEndereco());
-        prepared.setLong(5, func.getTelefone());
-
-        prepared.execute();
+            prepared.execute();
+            
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -63,35 +74,45 @@ public class ImplFuncionarioDAO implements IDAO<Funcionario> {
         
         PreparedStatement prepared;
         ResultSet result;
-        //TODO Fazer o insert do idoso aqui
-        String sql = "select * from funcionario"
-                + " where COD_FUNCIONARIO = ?";
-        prepared = con.prepareStatement(sql);
-
-        prepared.setInt(1, func.getCodFuncionario());
-
-        result = prepared.executeQuery();
-
-        if(!result.next()){
-            inserir(func);
-        }else{
-            sql =  "update funcionario "
-                    + "set COD_FUNCIONARIO = ?,"
-                        + "NOM_FUNCIONARIO = ?,"
-                        + "NOM_FUNCAO = ?,"
-                        + "ENDERECO = ?,"
-                        + "NUM_TELEFONE = ? "
-                  + "where COD_FUNCIONARIO = ?";
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from funcionario"
+                    + " where COD_FUNCIONARIO = ?";
             prepared = con.prepareStatement(sql);
-
+            
             prepared.setInt(1, func.getCodFuncionario());
-            prepared.setString(2, func.getNomeFuncionario());
-            prepared.setString(3, func.getNomeFuncao());
-            prepared.setString(4, func.getEndereco());
-            prepared.setLong(5, func.getTelefone());
-            prepared.setInt(6, func.getCodFuncionario());
-
-            prepared.execute();
+            
+            result = prepared.executeQuery();
+            
+            if(!result.next()){
+                inserir(func);
+            }else{
+                sql =  "update funcionario "
+                        + "set COD_FUNCIONARIO = ?,"
+                            + "NOM_FUNCIONARIO = ?,"
+                            + "NOM_FUNCAO = ?,"
+                            + "ENDERECO = ?,"
+                            + "NUM_TELEFONE = ? "
+                      + "where COD_FUNCIONARIO = ?";
+                prepared = con.prepareStatement(sql);
+                
+                prepared.setInt(1, func.getCodFuncionario());
+                prepared.setString(2, func.getNomeFuncionario());
+                prepared.setString(3, func.getNomeFuncao());
+                prepared.setString(4, func.getEndereco());
+                prepared.setLong(5, func.getTelefone());
+                prepared.setInt(6, func.getCodFuncionario());
+                
+                prepared.execute();
+            }
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
@@ -101,23 +122,34 @@ public class ImplFuncionarioDAO implements IDAO<Funcionario> {
         
         PreparedStatement prepared;
         ResultSet result;
-        //TODO Fazer o insert do idoso aqui
-        String sql = "select * from funcionario"
-                + " where COD_FUNCIONARIO = ?";
-        prepared = con.prepareStatement(sql);
-
-        prepared.setInt(1, func.getCodFuncionario());
-
-        result = prepared.executeQuery();
-
-        if(result.next()){
-            sql = "delete funcionario "
-                 + "where COD_FUNCIONARIO = ?";
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from funcionario"
+                    + " where COD_FUNCIONARIO = ?";
             prepared = con.prepareStatement(sql);
+            
             prepared.setInt(1, func.getCodFuncionario());
-            prepared.execute();
-        }else{
-            throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + func.getCodFuncionario());
+            
+            result = prepared.executeQuery();
+            
+            if(result.next()){
+                sql = "delete funcionario "
+                     + "where COD_FUNCIONARIO = ?";
+                prepared = con.prepareStatement(sql);
+                prepared.setInt(1, func.getCodFuncionario());
+                prepared.execute();
+            }else{
+                throw new DAOException("Não foi possível encontrar o alimento informado! Cod: " + func.getCodFuncionario());
+            }
+                
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
     }
 
@@ -130,29 +162,39 @@ public class ImplFuncionarioDAO implements IDAO<Funcionario> {
         
         PreparedStatement prepared;
         ResultSet result;
-        //TODO Fazer o insert do idoso aqui
-        String sql = "select * from funcionario "
-                    + "where COD_FUNCIONARIO = ?";
-        prepared = con.prepareStatement(sql);
-
-        prepared.setInt(1, codigo);
-
-        result = prepared.executeQuery();
-
-        Funcionario a = null;
-        while(result.next()){
-            int codFuncionario = result.getInt("COD_FUNCIONARIO");
-            String nomeFuncionario = result.getString("NOM_FUNCIONARIO").trim();
-            String nomFuncao = result.getString("NOM_FUNCAO").trim();
-            String endereco = result.getString("ENDERECO").trim();
-            long telefone = result.getLong("NUM_TELEFONE");
-
-            a = new Funcionario(codFuncionario, nomeFuncionario, nomFuncao, endereco, telefone);
+        try {
+            //TODO Fazer o insert do idoso aqui
+            String sql = "select * from funcionario "
+                        + "where COD_FUNCIONARIO = ?";
+            prepared = con.prepareStatement(sql);
+            
+            prepared.setInt(1, codigo);
+            
+            result = prepared.executeQuery();
+            
+            Funcionario a = null;
+            while(result.next()){
+                int codFuncionario = result.getInt("COD_FUNCIONARIO");
+                String nomeFuncionario = result.getString("NOM_FUNCIONARIO").trim();
+                String nomFuncao = result.getString("NOM_FUNCAO").trim();
+                String endereco = result.getString("ENDERECO").trim();
+                long telefone = result.getLong("NUM_TELEFONE");
+                
+                a = new Funcionario(codFuncionario, nomeFuncionario, nomFuncao, endereco, telefone);
+            }
+            
+            if(a == null){
+                throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codigo);
+            }
+            return a;
+        } finally {
+            try {
+                con.rollback();
+            } catch (SQLException ex1) {
+                System.out.println("Erro ao realizar rollback! ");
+                System.out.println(ex1.getMessage());
+                ex1.printStackTrace();
+            }
         }
-
-        if(a == null){
-            throw new DAOException("Não foi possível o encontrar alimento! Cod = " + codigo);
-        }
-        return a;
     }
 }
