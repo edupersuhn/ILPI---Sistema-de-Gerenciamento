@@ -101,7 +101,7 @@ public class FrameCadastroAlimento extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(127, 127, 127)
                         .addComponent(botaoCadastrar)))
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addContainerGap(107, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -146,6 +146,11 @@ public class FrameCadastroAlimento extends javax.swing.JFrame {
         jLabel4.setText("Nome do alimento:");
 
         botaoConsultar.setText("Consultar");
+        botaoConsultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoConsultarActionPerformed(evt);
+            }
+        });
 
         jLabel8.setText("Nome:");
 
@@ -194,7 +199,7 @@ public class FrameCadastroAlimento extends javax.swing.JFrame {
                             .addComponent(campoNomeConsulta))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(botaoConsultar)
-                        .addGap(0, 8, Short.MAX_VALUE))))
+                        .addGap(0, 22, Short.MAX_VALUE))))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(100, 100, 100)
                 .addComponent(botaoSalvar)
@@ -268,6 +273,20 @@ public class FrameCadastroAlimento extends javax.swing.JFrame {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_botaoCadastrarActionPerformed
+
+    private void botaoConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConsultarActionPerformed
+        if(!campoNomeConsulta.getText().isEmpty()){
+            try{
+                Alimento a = ImplAlimentoDAO.getInstance().encontrarPorNome(campoNomeConsulta.getText());
+                
+                campoNomeEdicao1.setText(a.getNomeAlimento());
+                campoQntEstoqueEdicao1.setText(a.getQtdEstoque() + "");
+                campoInfNutricionalEdicao1.setText(a.getInfoNutricional());
+            }catch(SQLException | DAOException ex){
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_botaoConsultarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea areaDescricao;
